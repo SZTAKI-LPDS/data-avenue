@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	 version="3.0">
+
+    <display-name>Data Avenue Core Services</display-name>
+    <description>Data Avenue Core Services</description>
+
+	<!-- Welcome page -->
+	<welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+	<!-- Error page -->
+	<!--error-page><exception-type>java.lang.Throwable</exception-type><location>/error.jsp</location></error-page-->
+
+	<!-- Servlet context listener (for DB initialization) -->
+    <listener>
+        <listener-class>
+             hu.sztaki.lpds.dataavenue.core.WebApplicationContextListener
+        </listener-class>
+    </listener>
+
+	<!-- REST servlet -->
+	<servlet>
+		<servlet-name>Data Avenue REST API</servlet-name>
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+		<init-param>
+		     <param-name>jersey.config.server.provider.packages</param-name>
+		     <param-value>hu.sztaki.lpds.dataavenue.core.rest</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Data Avenue REST API</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+		<url-pattern>/rest/v1/*</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Session timeout -->
+    <session-config>
+        <session-timeout>5</session-timeout>
+    </session-config>
+    
+	<!-- Protocol details web page -->    
+    <servlet>
+        <servlet-name>ProtocolDetails</servlet-name>
+        <servlet-class>hu.sztaki.lpds.dataavenue.core.servlets.ProtocolDetails</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProtocolDetails</servlet-name>
+        <url-pattern>/protocoldetails</url-pattern>
+    </servlet-mapping>
+
+	<!-- Commented out for security reasons. Uncomment, if you you need any of these services. -->
+	<!-- Task details web page -->    
+    <servlet>
+        <servlet-name>TaskDetails</servlet-name>
+        <servlet-class>hu.sztaki.lpds.dataavenue.core.servlets.TaskDetails</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TaskDetails</servlet-name>
+        <url-pattern>/admin/transfers</url-pattern>
+    </servlet-mapping>
+
+	<!-- Key list web page -->    
+    <servlet>
+        <servlet-name>KeyList</servlet-name>
+        <servlet-class>hu.sztaki.lpds.dataavenue.core.servlets.KeyList</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>KeyList</servlet-name>
+        <url-pattern>/admin/keys</url-pattern>
+    </servlet-mapping>
+    
+	<!-- Create key web page -->    
+    <servlet>
+        <servlet-name>CreateKey</servlet-name>
+        <servlet-class>hu.sztaki.lpds.dataavenue.core.servlets.CreateKey</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateKey</servlet-name>
+        <url-pattern>/admin/createkey</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Config web page -->    
+    <servlet>
+        <servlet-name>Config</servlet-name>
+        <servlet-class>hu.sztaki.lpds.dataavenue.core.servlets.Config</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Config</servlet-name>
+        <url-pattern>/admin/config</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Proxy x509 creation web page -->    
+    <servlet>
+        <servlet-name>Proxy</servlet-name>
+        <servlet-class>hu.sztaki.lpds.dataavenue.core.servlets.Proxy</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Proxy</servlet-name>
+        <url-pattern>/admin/proxy</url-pattern>
+    </servlet-mapping>
+    
+	<security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Admin area</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+            <http-method>HEAD</http-method>
+            <http-method>PUT</http-method>
+            <http-method>OPTIONS</http-method>
+            <http-method>TRACE</http-method>
+            <http-method>DELETE</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>Only administrators can use this app</description>
+            <role-name>manager-gui</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-role>
+  	   <role-name>manager-gui</role-name>
+    </security-role>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+		<realm-name>manager-gui</realm-name>
+	</login-config>
+	
+</web-app>

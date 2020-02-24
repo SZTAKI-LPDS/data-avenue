@@ -1,0 +1,31 @@
+<html><head><title>DataAvenue F.A.Q.</title></head>
+<body>
+<ul>
+
+<li>
+<b>Quesion:</b>
+When using Glogus proxy (with or without MyProxy or usercert) I get excetpion: 
+hu.sztaki.lpds.dataavenue.ws.CredentialException_Exception: Authentication failed (missing/invalid authentication data)!
+(java.lang.ClassCastException: org.bouncycastle.jce.X509Principal cannot be cast to org.bouncycastle.asn1.x509.X509Name).
+I see: "Could not load org.bouncycastle.jce.provider.JDKKeyPairGenerator$RSA" in my log. What to do?<br/>
+<b>Answer:</b> 
+Restart tomcat. (Some classes stucked in Classloader when the webapplication was redeployed.)
+
+<br/><br/>
+http://tomcat.apache.org/tomcat-3.3-doc/tomcat-ssl-howto.html:
+<br/>
+1. Downloading and Installing PureTLS
+<br/>
+The easiest way to download PureTLS is by simply downloading the prebuilt version from http://www.rtfm.com/puretls/prebuilt.html. This version contains all the jar files you will need in order to use PureTLS in one package. After expanding the package, there are two ways to make it available to Tomcat (choose one or the other):
+You can make PureTLS an installed extension by copying all three JAR files (cryptix32.jar, puretls.jar, and cryptix-asn1.jar) into your $JAVA_HOME/jre/lib/ext directory.
+Alternatively, you can make these jars available via the classpath that is passed to Tomcat on startup. This will need to be done in the appropriate startup script for your environment ( $TOMCAT_HOME/bin/tomcat in Unix, or %TOMCAT_HOME%\bin\tomcat.bat in Windows).
+Note: The system classpath is effectively ignored by Tomcat, so including the PureTLS jars there will not make them available for use by the Tomcat engine during runtime (although it will not conflict with the two methods described above if they do happen to be in the system classpath). Also, do not copy these jars into any of the internal Tomcat repositories (the $TOMCAT_HOME/lib/* directories, individual webapp directories, etc.). Doing so may cause Tomcat to fail, as these libraries should only be loaded by the system classloader.
+</li>
+
+
+
+</ul>
+</body>
+</html>
+
+<!--hu.sztaki.lpds.dataavenue.ws.CredentialException_Exception: Authentication failed (missing/invalid authentication data)!(caused by: [JGLOBUS-35] Unexpected certificate type: "class org.bouncycastle.jce.provider.X509CertificateObject")-->

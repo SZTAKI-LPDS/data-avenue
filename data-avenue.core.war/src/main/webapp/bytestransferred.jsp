@@ -1,0 +1,1 @@
+<%@page import="hu.sztaki.lpds.dataavenue.core.*" %>numberCb({"number":<%=Statistics.getBytesTransferred()/1048576%>,"version":"<%=Configuration.getVersion()%>"});

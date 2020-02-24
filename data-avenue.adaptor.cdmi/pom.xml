@@ -1,0 +1,112 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<name>Data Avenue Adaptor CDMI JAR</name>
+	<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
+	<artifactId>data-avenue.adaptor.cdmi</artifactId>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding> <!-- prevents some warnings -->
+		<slf4j.version>1.7.2</slf4j.version> <!-- SLF4J version -->
+	    <jclouds.version>1.7.1</jclouds.version>
+        <version.httpcomponents>4.2</version.httpcomponents>
+	</properties>
+
+	<dependencies>
+	
+		<!-- Data Avenue Core Interface -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.core</groupId>
+			<artifactId>data-avenue.core.adaptor-interface</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${version.httpcomponents}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${version.httpcomponents}</version>
+            <scope>compile</scope>
+        </dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<!-- libcdmi-java (not available in public maven repo) -->
+		<!-- dependency>
+			<groupId>eu.venusc.cdmi</groupId>
+			<artifactId>libcdmi</artifactId>
+			<version>1.0</version>
+		</dependency-->
+		
+		<!-- no cdmi support yet 
+		<dependency>
+			<groupId>org.apache.jclouds</groupId>
+			<artifactId>jclouds-all</artifactId>
+			<version>${jclouds.version}</version>
+		</dependency>
+		 -->
+
+		<!-- no doc  
+		<dependency>
+			<groupId>org.apache.jclouds.labs</groupId>
+			<artifactId>cdmi</artifactId>
+			<version>1.8.0-SNAPSHOT</version>
+		</dependency>
+		 -->
+		      
+		<!-- generic SLF4J dependency -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+
+		<!-- logback-classic for SLF4J and Tomcat6 -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>0.9.30</version> <!-- Tomcat6 supported till 0.9.30 -->
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<finalName>cdmi-adaptor</finalName> 
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

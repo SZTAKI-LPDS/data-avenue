@@ -1,0 +1,11 @@
+2017.12.14.
+- copy with retries using adaptive transfer
+
+2018.02.02
+- re-establish database connection
+- version prints cpu and memory details
+
+...
+
+2019.11.18.
+- opensourceified (any sensitive information, ips, hosts removed, keycloak removed, deprecations, etc.)

@@ -1,0 +1,13 @@
+#url=http://localhost:8080/dataavenue/rest
+#key=
+#dns=server:port
+
+#sftpDirURI=sftp://
+#sftpUsername=
+#sftpPassword=
+
+#s3DirURI=s3://
+#s3Username=
+#s3Password=
+
+#gridftpDirURI=gsiftp://

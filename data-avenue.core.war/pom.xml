@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>hu.sztaki.lpds.dataavenue.core</groupId>
+		<artifactId>data-avenue.core</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<name>Data Avenue Core Services WAR</name>
+	<artifactId>data-avenue.core.war</artifactId>
+	<packaging>war</packaging>
+	<url>https://data-avenue.eu/</url>
+	
+	<dependencies>
+		<!-- mysql-connector-java -->
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>5.1.42</version>
+		    <scope>runtime</scope>
+		</dependency>
+		
+		<!-- Data Avenue Core Services -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.core</groupId>
+			<artifactId>data-avenue.core.service</artifactId>
+			<version>${dataavenue.core.service.version}</version>
+		</dependency>
+		
+		<!-- Amazon S3 adaptor -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
+			<artifactId>data-avenue.adaptor.s3</artifactId>
+			<version>${dataavenue.core.adaptor.s3.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+	
+		<!-- Cassandra adaptor -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
+			<artifactId>data-avenue.adaptor.cassandra</artifactId>
+			<version>1.0.0</version>
+			<scope>runtime</scope>
+		</dependency>	
+		
+		<!-- Jclouds adaptor -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
+			<artifactId>data-avenue.adaptor.jclouds</artifactId>
+			<version>1.0.0</version>
+			<scope>runtime</scope>
+		</dependency>	
+
+		<!-- GSS adaptor -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
+			<artifactId>data-avenue.adaptor.gss</artifactId>
+			<version>1.0.0</version>
+			<scope>runtime</scope>
+		</dependency>	
+
+		<!-- HDFS adaptor -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
+			<artifactId>data-avenue.adaptor.hdfs</artifactId>
+			<version>1.0.0</version>
+			<scope>runtime</scope>
+		</dependency>	
+		
+		<!-- Override commons-logging:1.0.3 dependency and required runtime () -->
+		<dependency>
+			<!--  in conflict with commons-codec:1.3 <= amazon aws-->
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
+		<!--dependency>
+		    <groupId>org.mariadb.jdbc</groupId>
+		    <artifactId>mariadb-java-client</artifactId>
+		    <version>2.5.1</version>
+		</dependency-->
+		
+	</dependencies>
+
+	<properties>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>dd/MM/yyyy HH:mm</maven.build.timestamp.format>
+	</properties>
+
+	<build>
+		<!-- Name of the generated WAR file -->
+		<finalName>dataavenue</finalName> 
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<!-- axis-wsdl4j-1.5.1.jar: conflicts with apache-cxf SRM adaptor dependencies -->
+					<!-- jaxb-impl-2.2.6.jar: stucks in webapp -->					
+					<!-- servlet-api-2.5.jar: contained by tomcat -->
+					<!-- xml-apis-1.3.04.jar: jsaga-adaptor-wsgram: in conflict with JAX-WS: JAXP api/implementation of version 1.3.1 (included in JDK6) or higher is required. -->
+					<!-- xercesImpl-2.6.2.jar: included in Java6 (?) -->
+					<!-- bcprov-jdk16-1.46.jar: in conflict with jclouds' bcprov-ext-jdk15on-1.51.jar-->
+					<packagingExcludes>
+						WEB-INF/lib/bcprov-jdk16-1.46.jar,WEB-INF/lib/axis-wsdl4j-1.5.1.jar,WEB-INF/lib/jaxb-impl-2.2.6.jar,WEB-INF/lib/servlet-api-2.5.jar,WEB-INF/lib/xml-apis-1.3.04.jar,WEB-INF/lib/xercesImpl-2.6.2.jar 
+					</packagingExcludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

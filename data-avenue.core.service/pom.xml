@@ -1,0 +1,276 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>hu.sztaki.lpds.dataavenue.core</groupId>
+		<artifactId>data-avenue.core</artifactId>
+		<version>1.0.0</version>
+	</parent>
+
+	<name>Data Avenue Core Services JAR</name>
+	<artifactId>data-avenue.core.service</artifactId>
+	<packaging>jar</packaging>
+	<url>https://data-avenue.eu/</url>
+	
+	<properties>
+		<jsaga.version>1.1.1-SNAPSHOT</jsaga.version>
+		<!--
+		1.1.0: release version
+		1.1.1-SNAPSHOT: develop
+		1.1.0-SNAPSHOT: obselete
+		-->
+		<jsaga.engine.build>${jsaga.version}</jsaga.engine.build>
+		<jsaga.classic.build>${jsaga.version}</jsaga.classic.build>
+		<jsaga.irods.build>${jsaga.version}</jsaga.irods.build>
+		<jsaga.globus.build>${jsaga.version}</jsaga.globus.build>
+		<jsaga.ssh3.build>${jsaga.version}</jsaga.ssh3.build>
+		<jsaga.lfc.build>${jsaga.version}</jsaga.lfc.build>
+		<jsaga.srm.build>${jsaga.version}</jsaga.srm.build>
+		<jsaga.voms.build>${jsaga.version}</jsaga.voms.build>
+		<KEYCLOAK_VERSION>4.5.0.Final</KEYCLOAK_VERSION>
+		
+	</properties>
+	
+	<dependencies>
+	
+		<!-- DataAvenue core interface -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.core</groupId>
+			<artifactId>data-avenue.core.adaptor-interface</artifactId>
+			<version>${dataavenue.core.adaptor-interface.version}</version>
+		</dependency>
+		
+		<!--  web services (java11) -->
+		<!--dependency>
+			  <groupId>com.sun.xml.ws</groupId>
+			  <artifactId>jaxws-ri</artifactId>
+			  <version>2.3.0</version>
+			  <type>pom</type>
+		</dependency-->
+
+		<!-- JUnit -->
+		<dependency> 
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>		
+
+		<!-- Servlet-api -->
+		<dependency> 
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JSP -->
+		<dependency> 
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- JSLT -->
+		<dependency> 
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Generic SLF4J dependency -->
+		<dependency> 
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+
+		<!-- logback-classic for SLF4J and Tomcat6 -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>0.9.30</version>
+			<!--version>1.0.13</version--> <!-- Tomcat6 supported till 0.9.30 -->
+		</dependency>
+	
+		<!-- jSAGA core -->
+		<dependency> 
+			<groupId>fr.in2p3.jsaga</groupId>
+			<artifactId>jsaga-engine</artifactId>
+			<version>${jsaga.engine.build}</version>
+		</dependency>
+
+		<!-- jSAGA irods adaptor -->
+		<dependency> 
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-irods</artifactId>
+			<version>${jsaga.irods.build}</version>
+		</dependency>
+
+		<!-- jSAGA ssh adaptor -->
+		<dependency> 
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-ssh3</artifactId>
+			<version>${jsaga.ssh3.build}</version>
+		</dependency> 
+
+		<!-- jSAGA lfc adaptor -->
+		<dependency> 
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-lfc</artifactId>
+			<version>${jsaga.lfc.build}</version>
+		</dependency>
+
+		<!-- jSAGA srm adaptor -->
+		<dependency> 
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-srm</artifactId>
+			<version>${jsaga.srm.build}</version>
+		</dependency>
+
+		<!-- jSAGA classic adaptor (file, http, https) -->
+		<dependency> 
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-classic</artifactId>
+			<version>${jsaga.classic.build}</version>
+		</dependency>
+		
+		<!-- jSAGA classic VOMS -->
+		<dependency> 
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-voms</artifactId>
+			<version>${jsaga.voms.build}</version>
+		</dependency>
+
+		<!-- URL rewrite filter for tidy URL alisaes -->
+		<dependency> 
+			<groupId>org.tuckey</groupId>
+			<artifactId>urlrewritefilter</artifactId>
+			<version>4.0.3</version>
+		</dependency>
+
+		<!-- apache fileupload for handling POST requests -->
+		<dependency> 
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3</version>
+		</dependency>
+		
+		<!-- hybernate (JPA) -->
+		<dependency> 
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>5.2.17.Final</version>
+		</dependency>
+
+		<!-- hybernate c3po connection pool -->
+		<dependency> 
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-c3p0</artifactId>
+			<version>5.2.17.Final</version>
+		</dependency>
+		
+		<!-- Apache Commons Compress library -->
+		<dependency> 
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.7</version>
+		</dependency>
+		
+		<!-- REST jersey dependeces -->
+		<dependency>
+		    <groupId>org.glassfish.jersey.core</groupId>
+		    <artifactId>jersey-server</artifactId>
+		    <version>2.17</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.glassfish.jersey.core</groupId>
+		    <artifactId>jersey-common</artifactId>
+		    <version>2.17</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.glassfish.jersey.containers</groupId>
+		    <artifactId>jersey-container-servlet-core</artifactId>
+		    <version>2.17</version>
+		</dependency>
+
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-core -->
+		<!--
+		
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-authz-client</artifactId>
+			<version>${KEYCLOAK_VERSION}</version>
+			<scope>provided</scope>
+		</dependency>
+		 
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-core</artifactId>
+			<version>${KEYCLOAK_VERSION}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-adapter-core</artifactId>
+			<version>${KEYCLOAK_VERSION}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.4.1</version>
+		</dependency-->
+	
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		
+		<!--plugins> web service api is no longer supported
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>generate-wsdl</id>
+						<phase>package</phase>
+						<goals>
+							<goal>wsgen</goal>
+						</goals>
+						<configuration>
+							<sei>hu.sztaki.lpds.dataavenue.core.webservices.DataAvenueServiceImpl</sei>
+							<genWsdl>true</genWsdl>
+							<target>2.0</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins-->
+	</build>
+</project>

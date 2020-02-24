@@ -1,0 +1,5 @@
+CREATE DATABASE dataavenue;
+
+CREATE USER 'da'@'localhost' IDENTIFIED BY 'da';
+GRANT ALL PRIVILEGES ON dataavenue.* TO 'da'@'localhost' WITH GRANT OPTION;
+flush privileges;

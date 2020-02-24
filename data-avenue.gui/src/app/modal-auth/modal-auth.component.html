@@ -1,0 +1,39 @@
+<div class="modal-header">
+  <h4 class="modal-title">Authentication</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss(0)">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <p>Authenticate to {{currentdDir}} with</p>
+
+  <!-- https://ng-bootstrap.github.io/#/components/accordion/examples -->
+
+  <div class="panel-group" id="accordion" *ngIf="currentAuth">
+    <ngb-accordion [closeOthers]="true" activeIds="static-0">
+
+      <div *ngFor="let auth of currentAuth; let i = index">
+        <ngb-panel id="static-{{i}}">
+          <ng-template ngbPanelTitle>
+            <span (click)="setSelected(i)">&#9733; <b>{{auth.displayName}}</b></span>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="form-group" *ngFor="let f of auth.fields let fi = index">
+              <label for="fe{{fi}}">{{f.displayName}}</label>
+              <input [type]="f.type" class="form-control"
+                     id="fe{{fi}}"
+                     [(ngModel)]="currentAuth[i].fields[fi].value">
+            </div>
+          </ng-template>
+        </ngb-panel>
+      </div>
+
+    </ngb-accordion>
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-dark" (click)="activeModal.dismiss(0)">Cancel</button>
+  <button type="button" class="btn btn-outline-success" (click)="onOk(); activeModal.close()">Ok</button>
+</div>

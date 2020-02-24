@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<name>Data Avenue Adaptor HDFS JAR</name>
+	<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
+	<artifactId>data-avenue.adaptor.hdfs</artifactId>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding> <!-- prevents some warnings -->
+		<slf4j.version>1.7.2</slf4j.version> <!-- SLF4J version -->
+	</properties>
+
+	<dependencies>
+	
+		<!-- Data Avenue core interface -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.core</groupId>
+			<artifactId>data-avenue.core.adaptor-interface</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<!-- 
+		NOTE: !!!
+		Jersey 1.19 dependency craps up all other REST services of Data Avenue (Hadoop's jersey 1.19 dependency is fixed. Does not work with later.)
+		Modify file: (WEB-INF/lib/)jersey-server-1.19.jar/META-INF/services/jaxws.ws.ext.RuntimeDelegate <- org.glassfish.jersey.internal.RuntimeDelegateImpl
+		to fix UriBuilder abstract method invocation exception
+		(jaxws FactoryFinder order: 1 META-INF/services/... then 2 ${java.home}/lib/jaxrs.properties > 3 System property)
+		 -->
+
+		<!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs -->
+		<!-- Apache Hadoop 3.x now support only Java 8! -->
+		<!--  uses jersey 1.19 dependency !!! which is in conflict with others -->
+		<dependency>
+		    <groupId>org.apache.hadoop</groupId>
+		    <artifactId>hadoop-hdfs</artifactId>
+		    <version>3.2.0</version>
+		</dependency>
+
+		<!--  uses jersey 1.19 dependency !!! which is in conflict with others -->
+		<dependency>
+		    <groupId>org.apache.hadoop</groupId>
+		    <artifactId>hadoop-common</artifactId>
+		    <version>3.2.0</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.glassfish.jersey.core</groupId>
+		    <artifactId>jersey-server</artifactId>
+		    <version>2.17</version>
+		</dependency>
+		
+		<!--dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-core</artifactId>
+			<version>3.2.0</version>
+		</dependency-->
+
+ 		<dependency>
+		    <groupId>org.apache.hadoop</groupId>
+		    <artifactId>hadoop-client</artifactId>
+		    <version>3.2.0</version>
+		</dependency>
+
+		<!--dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-auth</artifactId>
+			<version>3.2.0</version>
+		</dependency-->		
+
+ 		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-annotations</artifactId>
+		    <version>2.9.5</version>
+		</dependency>
+
+		<!-- generic SLF4J dependency -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+
+		<!-- logback-classic for SLF4J and Tomcat6 -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>0.9.30</version> <!-- Tomcat6 supported till 0.9.30 -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<finalName>data-avenue-hdfs-adaptor</finalName> 
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

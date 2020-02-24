@@ -1,0 +1,27 @@
+#!/bin/bash
+sudo apt-get update
+sudo apt-get install -y docker-compose
+cd data-aveune-docker-compose
+sudo docker-compose up -d
+curl -o /dev/null -f -sS http://localhost/dataavenue/ || echo Data Avenue is not running on HTTP 80
+curl -o /dev/null -f -sSk https://localhost/dataavenue/ || echo Data Avenue is not running on HTTPS 443
+curl -o /dev/null -f -sS http://localhost:8080/dataavenue/ || echo Data Avenue is not running on HTTP 8080
+curl http://localhost/dataavenue/rest/version || echo Data Avenue REST is running
+
+# Re-create haproxy/dataavenue.pem (on demand):
+# openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout mykey.key -subj "/C=HU/ST=HU/L=Budapest/O=SZTAKI LPDS/CN=Data Avenue" -out mycert.crt
+# cat mycert.crt mykey.key > ./haproxy/dataavenue.pem
+
+# More tests:
+# on GUI: http://localhost:8080/dataavenue/ui/ Go: http://xenia.sote.hu/ftp/mirrors/www.apache.org/tomcat/tomcat-8/v8.5.47/bin/
+# vi ./test/test.config
+# sh test/test.sh
+
+
+
+# Re-build dataavenue.war (on demand):
+# cd ..
+# mvn install
+# cp dataavenue.core.war/target/dataavenue.war data-avenue.docker-compose/dataavenue/webapps/
+# cd data-avenue.docker-compose
+

@@ -1,0 +1,17 @@
+<html><head><title>Data Avenue Known Issues</title></head>
+<body>
+<ul>
+<li>
+There are problems with copying/moving directories or files containing white spaces in their names. 
+(Redmine issues: 402, 420. A future possible solution is to iterate over entires and handle/skip such exceptions manually.) 
+</li>
+
+<li>
+Using SFTP sometimes "Unable to connect to server (caused by: verify: false)" exception is thrown. 
+This comes from an underlying jsch sftp library (used by JSAGA), and there is no known real reason or workaround for this problem. 
+(The new JSAGA version is based on another sftp implementation.)
+</li>
+  
+</ul>
+</body>
+</html>

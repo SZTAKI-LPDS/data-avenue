@@ -1,0 +1,433 @@
+<ngb-tabset type="tabs" (tabChange)="beforeTabChange($event)">
+  <ngb-tab id="tab-main">
+    <ng-template ngbTabTitle><b>Main</b></ng-template>
+    <ng-template ngbTabContent>
+
+      <table style="width: 100%">
+        <tr>
+          <th [ngClass]="{'sh': selectedSide==LEFT}">
+            <div class="input-group input-group-sm">
+              <input type="text" class="form-control" size="50%"
+                     [(ngModel)]="currentdDir[LEFT]"
+                     placeholder="URI (e.g.: s3://aws.amazon.com/bucket/)"
+                     (keypress)="isEnterPressedOnUrl($event, LEFT)"/>
+              <div class="input-group-append">
+                <button class="btn btn-secondary" type="button"
+                        [disabled]="!isConnectedToDA"
+                        (click)="onUrlSelected(LEFT)">Go
+                </button>
+                <div class="input-group-text">
+                  <input type="checkbox"
+                         data-toggle="tooltip" data-placement="bottom" title="Details"
+                         [disabled]="!daService.authList[LEFT].isAuthenticated"
+                         [(ngModel)]="isDetailed[LEFT]"
+                         (change)="onUrlSelected(LEFT)"/>
+                </div>
+                <button class="btn btn-secondary" type="button"
+                        data-toggle="tooltip" data-placement="top" title="Use the right side's URL"
+                        *ngIf="daService.daAdvancedMode"
+                        [disabled]="!daService.authList[RIGHT].isAuthenticated"
+                        (click)="onUseOther(LEFT)">&lt;
+                </button>
+              </div>
+            </div>
+
+          </th>
+          <th [ngClass]="{'sh': selectedSide==RIGHT}">
+            <div class="input-group input-group-sm">
+              <div class="input-group-prepend" *ngIf="daService.daAdvancedMode">
+                <button class="btn btn-secondary" type="button"
+                        data-toggle="tooltip" data-placement="top" title="Use the left side's URL"
+                        [disabled]="!daService.authList[LEFT].isAuthenticated"
+                        (click)="onUseOther(RIGHT)">>
+                </button>
+              </div>
+              <input type="text" class="form-control" size="50%"
+                     [(ngModel)]="currentdDir[RIGHT]"
+                     placeholder="URI (e.g.: s3://aws.amazon.com/bucket/)"
+                     (keypress)="isEnterPressedOnUrl($event, RIGHT)"/>
+              <div class="input-group-append">
+                <button class="btn btn-secondary" type="button"
+                        [disabled]="!isConnectedToDA"
+                        (click)="onUrlSelected(RIGHT)">Go
+                </button>
+                <div class="input-group-text">
+                  <input type="checkbox"
+                         data-toggle="tooltip" data-placement="bottom" title="Details"
+                         [disabled]="!daService.authList[RIGHT].isAuthenticated"
+                         [(ngModel)]="isDetailed[RIGHT]"
+                         (change)="onUrlSelected(RIGHT)"/>
+                </div>
+              </div>
+            </div>
+
+          </th>
+        </tr>
+        <tr>
+          <td class="top">
+            <div class="loader-container" [style.height.px]="height" [style.max-height.px]="height"
+                 [hidden]="!isLoad[LEFT]">
+              Loading...<br> <br>
+              <div [ngClass]="{'loader': isLoad[LEFT]}"></div>
+              <br>
+            </div>
+            <div class="panel"
+                 [hidden]="isLoad[LEFT]"
+                 [style.height.px]="height"
+                 [style.max-height.px]="height"
+                 [ngClass]="{'panel-file-over': hasDropZoneOverLeft, 'panel-selected': selectedSide==LEFT}"
+                 (click)="selectedSide=LEFT"
+                 (fileOver)="fileOverLeft($event)"
+                 ng2FileDrop
+                 [uploader]="uploader">
+              <table class="filelist">
+                <thead>
+                <tr class="h">
+                  <td>Name</td>
+                  <td *ngIf="isDetailed[LEFT]">Size</td>
+                  <td *ngIf="isDetailed[LEFT]">Date</td>
+                  <!-- <td *ngIf="isDetailed[LEFT]">Permission</td> -->
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngIf="enablePrevDir(LEFT)"
+                    (dblclick)="onChangeDirToPrev(LEFT)"
+                    (click)="onSel(null, $event, -1, LEFT)">
+                  <td class="d" [colSpan]="3">..</td>
+                </tr>
+                <tr class="p"
+                    *ngFor="let elem of dirList[LEFT]; let i = index"
+                    [ngClass]="{'s': elem.sel, 'i': activeIndex[LEFT] == i}"
+                    (click)="onSel(elem, $event, i, LEFT)"
+                    (dblclick)="onCD(elem, LEFT)">
+                  <td class="{{ getType(elem.name) }}">{{ elem.name }}</td>
+                  <td *ngIf="isDetailed[LEFT]">{{ formatSize(elem.size)}}</td>
+                  <td *ngIf="isDetailed[LEFT]">{{ elem.date | date:'yyyy.MM.dd. HH:mm' }}</td>
+                  <!-- <td *ngIf="isDetailed[LEFT]">{{ elem.perm }}</td> -->
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </td>
+          <td class="top">
+            <div class="loader-container"
+                 [style.height.px]="height"
+                 [style.max-height.px]="height"
+                 [hidden]="!isLoad[RIGHT]">
+              Loading...<br> <br>
+              <div [ngClass]="{'loader': isLoad[RIGHT]}"></div>
+              <br>
+            </div>
+            <div class="panel"
+                 [hidden]="isLoad[RIGHT]"
+                 [style.height.px]="height"
+                 [style.max-height.px]="height"
+                 [ngClass]="{'panel-file-over': hasDropZoneOverRight, 'panel-selected': selectedSide==RIGHT, 'loader': isLoad[RIGHT]}"
+                 (click)="selectedSide=RIGHT"
+                 (fileOver)="fileOverRight($event)"
+                 ng2FileDrop
+                 [uploader]="uploader">
+              <table class="filelist">
+                <thead>
+                <tr class="h">
+                  <td>Name</td>
+                  <td *ngIf="isDetailed[RIGHT]">Size</td>
+                  <td *ngIf="isDetailed[RIGHT]">Date</td>
+                  <!-- <td *ngIf="isDetailed[RIGHT]">Permission</td> -->
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngIf="enablePrevDir(RIGHT)"
+                    (dblclick)="onChangeDirToPrev(RIGHT)"
+                    (click)="onSel(null, $event, -1, RIGHT)">
+                  <td class="d" [colSpan]="3">..</td>
+                </tr>
+                <tr class="p"
+                    *ngFor="let elem of dirList[RIGHT]; let i = index"
+                    [ngClass]="{'s': elem.sel, 'i': activeIndex[RIGHT] == i}"
+                    (click)="onSel(elem, $event, i, RIGHT)"
+                    (dblclick)="onCD(elem, RIGHT)">
+                  <td class="{{ getType(elem.name) }}">{{ elem.name }}</td>
+                  <td *ngIf="isDetailed[RIGHT]">{{ formatSize(elem.size)}}</td>
+                  <td *ngIf="isDetailed[RIGHT]">{{ elem.date | date:'yyyy.MM.dd. HH:mm' }}</td>
+                  <!-- <td *ngIf="isDetailed[RIGHT]">{{ elem.perm }}</td> -->
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" style="text-align: center;">
+            <button class="btn btn-dark btn-sm space" (click)="onDownload()" [disabled]="isBtnDownloadDisabled()">
+              Download
+            </button>
+            <a #downLoadLinkElement></a>
+            <button class="btn btn-dark btn-sm space" (click)="onCopy(false)" [disabled]="isBtnCopyDisabled()">
+              Copy
+            </button>
+            <button class="btn btn-dark btn-sm space" (click)="onCopy(true)" [disabled]="isBtnCopyDisabled()">
+              Move
+            </button>
+            <button class="btn btn-dark btn-sm space" (click)="openMkDir(modalmkdir)" [disabled]="isBtnMkDirDisabled()">
+              MkDir
+            </button>
+            <button class="btn btn-dark btn-sm space" (click)="openDel()" [disabled]="isBtnDeleteDisabled()">
+              Delete
+            </button>
+            <button class="btn btn-dark btn-sm space" [disabled]="true"
+                    data-toggle="tooltip" data-placement="top" title="Not yet supported">
+              Rename
+            </button>
+            Upload: <input type="file" class="btn btn-dark btn-sm"
+                           [disabled]="isBtnUploadDisabled()"
+                           ng2FileSelect
+                           [uploader]="uploader" multiple/>
+          </td>
+        </tr>
+      </table>
+
+    </ng-template>
+  </ngb-tab>
+
+
+  <ngb-tab id="tab-uploads">
+    <ng-template ngbTabTitle>
+    <span class="counter-container"><b>Uploads</b>
+      <span class="counter-counter" *ngIf="uploader?.queue?.length > 0">{{uploader?.queue?.length }}</span>
+    </span>
+    </ng-template>
+    <ng-template ngbTabContent>
+
+      <div style="margin-bottom: 20px">
+        <div class="text-center">Uploads: {{uploader?.queue?.length }}
+          Finished: {{(uploader?.queue?.length - uploader.getNotUploadedItems().length)}}
+          Not uploaded: {{uploader.getNotUploadedItems().length}}
+        </div>
+        <div class="text-center">
+          <div>
+            <div class="progress" style="">
+              <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': uploader.progress + '%' }">
+                {{uploader.progress}} %
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-warning btn-sm space"
+                  (click)="uploader.cancelAll()"
+                  [disabled]="!uploader.isUploading">
+            Cancel all
+          </button>
+          <button type="button" class="btn btn-primary btn-sm space"
+                  (click)="uploader.clearQueue()"
+                  [disabled]="!uploader.queue.length">
+            Clear all
+          </button>
+          <button type="button" class="btn btn-danger btn-sm"
+                  (click)="uploader.uploadAll()"
+                  [disabled]="!uploader.getNotUploadedItems().length">
+            Retry all
+          </button>
+        </div>
+
+        <div class="panel"
+             [style.height.px]="height"
+             [style.max-height.px]="height">
+          <table style="width: 100%" class="transferTbl">
+            <thead>
+            <tr class="h text-center">
+              <th width="50%">Name</th>
+              <th *ngIf="uploader.options.isHTML5">Size</th>
+              <th *ngIf="uploader.options.isHTML5">Progress</th>
+              <th>Status</th>
+              <th>Overwrite</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let item of uploader.queue">
+              <td>{{ item?.headers[0].value }} <!-- X-URI ( name: {{ item?.file?.name }})--></td>
+              <td *ngIf="uploader.options.isHTML5" class="text-center" style="white-space: nowrap">
+                {{formatSize(item?.file?.size)}}
+              </td>
+              <td *ngIf="uploader.options.isHTML5">
+                <div class="progress" style="margin-bottom: 0;">
+                  <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': item.progress + '%' }">
+                    {{item?.progress}}
+                  </div>
+                </div>
+              </td>
+              <td class="text-center" style="width: 10%">
+                <span *ngIf="item.isSuccess"><i>OK</i></span>
+                <span *ngIf="item.isCancel"><i>CANCEL</i></span>
+                <span *ngIf="item.isError"><i>ERROR</i></span>
+                <span *ngIf="item.isUploading"><i>UPLOADING</i></span>
+              </td>
+              <td class="text-center">
+                <input type="checkbox"
+                       #overwriteCheckBox
+                       [disabled]="item.isReady || item.isUploading || item.isSuccess"
+                       (change)="setMethod(item, overwriteCheckBox.checked)">
+              </td>
+              <td>
+                <button type="button" class="btn btn-danger btn-sm space"
+                        (click)="item.upload()"
+                        [hidden]="item.isReady || item.isUploading || item.isSuccess">
+                  Retry
+                </button>
+                <button type="button" class="btn btn-warning btn-sm space"
+                        (click)="item.cancel()"
+                        [hidden]="!item.isUploading">
+                  Cancel
+                </button>
+                <button type="button" class="btn btn-primary btn-sm"
+                        (click)="item.remove()">
+                  Clear
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </ng-template>
+  </ngb-tab>
+
+
+  <ngb-tab id="tab-transfers">
+    <ng-template ngbTabTitle>
+    <span class="counter-container"><b>Transfers</b>
+      <span class="counter-counter" *ngIf="transferStatusList.length > 0">{{transferStatusList.length}}</span>
+    </span>
+    </ng-template>
+    <ng-template ngbTabContent>
+
+      <div>
+        <div class="text-center">Transfers: {{transferStatusList.length}}</div>
+        <div class="text-center">
+          <button class="btn btn-primary btn-sm" [disabled]="transferStatusList.length == 0"
+                  (click)="acknowledgeAllTransfer()">Acknowledge all
+          </button>
+        </div>
+        <div class="loader-container" [style.height.px]="height" [style.max-height.px]="height"
+             [hidden]="acknowledging == 0">
+          Please wait...<br> <br>
+          <div [ngClass]="{'loader': acknowledging > 0}"></div>
+          <br>
+        </div>
+        <div class="panel"
+             [style.height.px]="height"
+             [style.max-height.px]="height"
+             [hidden]="acknowledging > 0">
+          <table style="width: 100%" class="transferTbl"
+                 *ngIf="transferStatusList.length > 0">
+            <thead>
+            <tr class="h text-center">
+              <th>Source</th>
+              <th>Target</th>
+              <th>Size</th>
+              <th>Progress</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let ts of transferStatusList">
+              <td>{{ts.source}}</td>
+              <td>{{ts.target}}</td>
+              <td style="white-space: nowrap">
+                {{formatSize(ts.bytesTransferred) }} / {{formatSize(ts.size)}}</td>
+              <td>
+                <div class="progress" style="margin-bottom: 0;">
+                  <div class="progress-bar" role="progressbar"
+                       [ngStyle]="{ 'width': ts.percent + '%' }">{{ts.percent}}</div>
+                </div>
+              </td>
+              <td class="text-center" style="width: 10%">{{ts.status}}</td>
+
+              <td>
+                <button class="btn btn-primary btn-sm"
+                        (click)="transferStatusListRemove(ts.id)"
+                        [hidden]="ts.status=='TRANSFERRING'">Acknowledge
+                </button>
+                <button class="btn btn-warning btn-sm"
+                        (click)="doAbortTransfer(ts.id)"
+                        [hidden]="ts.status!='TRANSFERRING'">Abort
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </ng-template>
+  </ngb-tab>
+
+
+  <ngb-tab *ngIf="daService.daAdvancedMode">
+    <ng-template ngbTabTitle><b>Logs</b></ng-template>
+    <ng-template ngbTabContent>
+      <app-messages></app-messages>
+    </ng-template>
+  </ngb-tab>
+
+
+  <ngb-tab id="tab-settings">
+    <ng-template ngbTabTitle>
+      <b>Settings</b></ng-template>
+    <ng-template ngbTabContent></ng-template>
+  </ngb-tab>
+
+
+  <ngb-tab id="tab-about">
+    <ng-template ngbTabTitle>
+      <b>About</b></ng-template>
+    <ng-template ngbTabContent></ng-template>
+  </ngb-tab>
+
+
+  <ngb-tab id="tab-clrnotify" *ngIf="daService.daAdvancedMode">
+    <ng-template ngbTabTitle>
+      <b>Clear notifications</b></ng-template>
+    <ng-template ngbTabContent></ng-template>
+  </ngb-tab>
+
+</ngb-tabset>
+
+
+<ng-template #modalmkdir let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Make directory</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Make directory in {{currentdDir[selectedSide]}}</p>
+    <p>
+      <input [(ngModel)]="mkdirName" placeholder="New directory name" (keypress)="isEnterPressed($event, c)"/>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="c(BTN_CANCEL)">Cancel</button>
+    <button type="button" class="btn btn-outline-success" (click)="c(BTN_OK)">Ok</button>
+  </div>
+</ng-template>
+
+<ng-template #modaldel let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Delete</h4>
+    <button type="button" ngbAutofocus class="close" aria-label="Close"
+            (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Delete the selected item(s)?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="c(BTN_CANCEL)">Cancel</button>
+    <button type="button" class="btn btn-outline-success" (click)="c(BTN_OK)">Ok</button>
+  </div>
+</ng-template>

@@ -1,0 +1,23 @@
+<div class="modal-header">
+  <h4 class="modal-title">Settings</h4>
+  <button type="button" class="close" aria-label="Close" (click)="settingsModal.dismiss(0)">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <p>
+    Data Avenue server URL: <input [(ngModel)]="settingDaBaseUrl"
+                                   placeholder=""/>
+  </p>
+  <p>
+    Data Avenue server KEY: <input [(ngModel)]="settingDaAuthKey"/>
+    <!--  type="password" -->
+  </p>
+  <p>
+    Advanced mode: <input type=checkbox [(ngModel)]="settingExtendedMode"/>
+  </p>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-dark" (click)="settingsModal.dismiss(0)">Cancel</button>
+  <button type="button" class="btn btn-outline-success" (click)="OnSubmit()">Ok</button>
+</div>

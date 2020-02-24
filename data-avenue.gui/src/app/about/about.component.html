@@ -1,0 +1,37 @@
+<div class="modal-header">
+  <h4 class="modal-title">Welcome to Data Avenue GUI</h4>
+  <button type="button" class="close" aria-label="Close"
+          (click)="settingsModal.dismiss(0)">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <img alt="Data Avenue GUI logo" src="assets/images/da_logo.png">
+  <p>
+    Data Avenue GUI Version 0.25 beta<br/>
+  </p>
+  <p>
+    Connected to web application: {{daService.daBaseUrl}} <br/>
+    {{daVersion}}
+  </p>
+  <p>{{daProtocols}}</p>
+  <ul style="list-style-type:none;">
+    <li>Shortcuts:</li>
+    <li>F3 = Download</li>
+    <li>F5 = Copy</li>
+    <li>F6 = Move</li>
+    <li>F7 = MkDir</li>
+    <li>F8 = Delete</li>
+    <li>TAB= Change panel</li>
+    <li>* = Invert selection</li>
+    <li>CTRL + click = Multiple selection</li>
+  </ul>
+
+  <p>2020 SZTAKI LPDS</p>
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-dark"
+          (click)="settingsModal.dismiss(0)">Close
+  </button>
+</div>

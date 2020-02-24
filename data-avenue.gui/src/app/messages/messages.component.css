@@ -1,0 +1,7 @@
+.messagebox {
+	border: 1px solid grey;
+	border-collapse: collapse;
+	padding: 5px;
+	font-family: monospace;
+	font-size: medium;
+}

@@ -1,0 +1,9 @@
+<div>
+  <button class="btn btn-light btn-sm" (click)="messageService.clear()">Clear logs</button>
+
+  <div class="messagebox" style="overflow: scroll; height: 300px;"
+       [hidden]="hideLogs" #scrollMe [scrollTop]="scrollMe.scrollHeight">
+    <div *ngFor='let message of messageService.messages'
+         class="alert-{{message.typ}}">{{message.txt}}</div>
+  </div>
+</div>

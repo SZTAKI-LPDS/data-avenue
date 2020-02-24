@@ -1,0 +1,48 @@
+version: "2"
+services:
+  dataavenue-database:
+    image: mysql:5
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=hypersecretrootpass
+      - MYSQL_USER=da
+      - MYSQL_PASSWORD=da
+      - MYSQL_DATABASE=dataavenue
+    volumes:
+      - ./db/data:/var/lib/mysql
+    hostname: dataavenue-database
+    container_name: dataavenue-database
+
+  dataavenue-service:
+    image: tomcat:7
+    restart: always
+    environment:
+      - JAVA_OPTS="-Djava.security.egd=file:///dev/urandom -Xmx2G -Xss800m"
+    depends_on:
+      - dataavenue-database
+    links:
+      - dataavenue-database
+    volumes:
+      - ./dataavenue/webapps:/usr/local/tomcat/webapps
+      - ./dataavenue/logs:/usr/local/tomcat/logs
+      - ./dataavenue/conf/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+    ports:
+      - "8080:8080"
+    hostname: dataavenue-service
+    container_name: dataavenue-service
+
+  dataavenue-haproxy:
+    image: haproxy:1.8-alpine
+    volumes:
+    - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    - ./haproxy/dataavenue.pem:/usr/local/etc/haproxy/dataavenue.pem
+    depends_on:
+      - dataavenue-service
+    links:
+      - dataavenue-service
+    ports:
+    - "80:80"
+    - "443:443"
+    hostname: dataavenue-haproxy
+    container_name: dataavenue-haproxy
+
