@@ -48,6 +48,7 @@ import hu.sztaki.lpds.dataavenue.interfaces.impl.AuthenticationTypeListImpl;
 import static hu.sztaki.lpds.dataavenue.interfaces.OperationsEnum.*;
 import static hu.sztaki.lpds.cdmi.api.CDMIConstants.*;
 
+@SuppressWarnings("deprecation")
 public class CDMIAdaptor implements Adaptor {
 	private static final Logger log = LoggerFactory.getLogger(CDMIAdaptor.class);
 	private String adaptorVersion = "1.0.0"; // default adaptor version
@@ -207,7 +208,8 @@ public class CDMIAdaptor implements Adaptor {
 		String cdmiHost = (CDMI_PRPOTOCOL.equals(uri.getProtocol()) ? "http://" : "https://") + uri.getHost() + (uri.getPort() != null ? ":" + uri.getPort() : "");
 		
 		// create container
-        HttpClient httpclient = new DefaultHttpClient();
+        @SuppressWarnings("resource")
+		HttpClient httpclient = new DefaultHttpClient();
 		HttpPut httpput = new HttpPut(cdmiHost + uri.getPath()); // "http://localhost:8082/cdmi-server/TestContainer"
         httpput.setHeader("Content-Type", "application/cdmi-container");
         httpput.setHeader("X-CDMI-Specification-Version", CDMI_SPECIFICATION_VERSION);

@@ -3,8 +3,9 @@ package hu.sztaki.lpds.cdmi.api;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+@SuppressWarnings("deprecation")
 public class CDMIHTTPClient {
-//	FIXME create client manager
+//	fxime create client manager
 //	static HttpClient client;
 	static {
 //		HttpParams params = new BasicHttpParams();

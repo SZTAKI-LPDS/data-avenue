@@ -36,13 +36,17 @@ Projects in which Data Avenue were actively used:
 You can use docker(-compose) to launch Data Avenue. 
 On Ubuntu (similar in other distros):
 
- ``mvn clean package``
+``sudo apt-get update; sudo apt-get install git maven openjdk-8-jdk docker-compose``
 
-``sudo apt-get install docker-compose``
+``git clone https://github.com/SZTAKI-LPDS/data-avenue.git``
+
+``cd data-avenue``
+
+``mvn clean package``
 
 ``cd data-avenue.docker-compose``
 
- ``sudo docker-compose up -d``
+``sudo docker-compose up -d``
 
 
 ## GUI
