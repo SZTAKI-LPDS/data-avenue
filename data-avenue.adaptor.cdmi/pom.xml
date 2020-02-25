@@ -12,7 +12,8 @@
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding> <!-- prevents some warnings -->
 		<slf4j.version>1.7.2</slf4j.version> <!-- SLF4J version -->
 	    <jclouds.version>1.7.1</jclouds.version>
-        <version.httpcomponents>4.2</version.httpcomponents>
+	    <!-- 4.2 has security flaws, update to 4.3.6 -->
+        <version.httpcomponents>4.4</version.httpcomponents>
 	</properties>
 
 	<dependencies>
