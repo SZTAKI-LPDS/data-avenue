@@ -48,6 +48,8 @@ import hu.sztaki.lpds.dataavenue.interfaces.impl.AuthenticationTypeListImpl;
 import static hu.sztaki.lpds.dataavenue.interfaces.OperationsEnum.*;
 import static hu.sztaki.lpds.cdmi.api.CDMIConstants.*;
 
+import javax.xml.bind.DatatypeConverter;
+
 @SuppressWarnings("deprecation")
 public class CDMIAdaptor implements Adaptor {
 	private static final Logger log = LoggerFactory.getLogger(CDMIAdaptor.class);
@@ -189,7 +191,7 @@ public class CDMIAdaptor implements Adaptor {
 						String creationDateString = (String) metadata.get(CDMIConstants.CDMI_METADATA_CTIME);
 						if (creationDateString != null) {
 							try { 
-								Calendar cal = javax.xml.bind.DatatypeConverter.parseDateTime(creationDateString);
+								Calendar cal = DatatypeConverter.parseDateTime(creationDateString);
 								fileEntry.setLastModified(cal.getTimeInMillis());
 							} catch (IllegalArgumentException  e) { log.warn("Date format exception: " + creationDateString);}
 						}
