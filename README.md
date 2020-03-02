@@ -44,6 +44,8 @@ On Ubuntu (similar in other distros):
 
 ``mvn clean package``
 
+``cp data-avenue.core.war/target/dataavenue.war data-avenue.docker-compose/dataavenue/webapps/``
+
 ``cd data-avenue.docker-compose``
 
 ``sudo docker-compose up -d``
