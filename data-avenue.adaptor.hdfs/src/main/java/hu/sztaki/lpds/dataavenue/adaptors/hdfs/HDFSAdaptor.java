@@ -69,6 +69,7 @@ public class HDFSAdaptor implements Adaptor {
 		try {
 			// See: https://hadoop.apache.org/docs/r3.2.0/hadoop-project-dist/hadoop-common/core-default.xml
 			hdfsConfiguration.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
+			hdfsConfiguration.set("fs.hdfs.impl.disable.cache", "true"); // disable cache to avoid different clients closing each others filesystem
 			hdfsConfiguration.set("ipc.client.connect.timeout", "2000");
 			hdfsConfiguration.set("ipc.client.connect.max.retries.on.timeouts", "2");
 			hdfsConfiguration.set("dfs.client.use.datanode.hostname", "true");
