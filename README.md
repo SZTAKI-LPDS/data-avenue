@@ -31,7 +31,7 @@ Projects in which Data Avenue were actively used:
 - ViaLactea - The Milky Way as a Star Formation Engine, EU FP7-Space, 607380, 2013-2016
 
 
-## Try it
+## Give it a try
 
 You can use docker(-compose) to launch Data Avenue. 
 On Ubuntu (similar in other distros):
@@ -61,9 +61,10 @@ or
 
 [https://localhost/dataavenue/ui/](https://localhost/dataavenue/ui/)
 
-To browse an HTTP server, you can try "URI" http://xenia.sote.hu/pub/mirrors/www.apache.org/tomcat/, press Go, then choose: "No authentication". 
-
 ![Data Avenue UI](docs/figures/screenshot.png)
+
+As a first try, you might use the URI http://xenia.sote.hu/ftp/mirrors/www.apache.org/, press Go, then choose: "No authentication". You should now see a directory listing of various Apache projects.  
+
 
 ## REST API
 
