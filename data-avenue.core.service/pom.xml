@@ -31,6 +31,8 @@
 		<jsaga.voms.build>${jsaga.version}</jsaga.voms.build>
 		<KEYCLOAK_VERSION>4.5.0.Final</KEYCLOAK_VERSION>
 		
+		<maven.compiler.source>1.6</maven.compiler.source>
+		<maven.compiler.target>1.6</maven.compiler.target>
 	</properties>
 	
 	<dependencies>

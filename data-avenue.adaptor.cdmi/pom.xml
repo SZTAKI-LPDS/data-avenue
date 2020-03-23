@@ -14,6 +14,8 @@
 	    <jclouds.version>1.7.1</jclouds.version>
 	    <!-- 4.2 has security flaws, update to 4.3.6 -->
         <version.httpcomponents>4.4</version.httpcomponents>
+		<maven.compiler.source>1.6</maven.compiler.source>
+		<maven.compiler.target>1.6</maven.compiler.target>
 	</properties>
 
 	<dependencies>

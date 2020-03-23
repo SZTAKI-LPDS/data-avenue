@@ -13,6 +13,8 @@
 		<slf4j.version>1.7.2</slf4j.version> <!-- SLF4J version -->
 	    <jclouds.version>1.7.1</jclouds.version>
         <version.httpcomponents>4.2</version.httpcomponents>
+		<maven.compiler.source>1.6</maven.compiler.source>
+		<maven.compiler.target>1.6</maven.compiler.target>
 	</properties>
   
 	<dependencies>

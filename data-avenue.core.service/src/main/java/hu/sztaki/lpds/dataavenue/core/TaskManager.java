@@ -169,7 +169,7 @@ public final class TaskManager {
 	
 	// get non-acknowledged tasks
 	public Collection<ExtendedTransferMonitor> getAllNonAcknowledgedUserTranferDetails(final String ticket) {
-		List <ExtendedTransferMonitor> tasks = new Vector<>();
+		List <ExtendedTransferMonitor> tasks = new Vector<ExtendedTransferMonitor>();
 		
 		for (ExtendedTransferMonitor monitor: activeTransfers.values()) { 
 			if (monitor.getTicket().equals(ticket) && monitor.getAcknowledged() == false) tasks.add(monitor);

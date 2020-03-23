@@ -12,6 +12,8 @@
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding> <!-- prevents some warnings -->
 		<slf4j.version>1.7.2</slf4j.version> <!-- SLF4J version -->
 	    <jclouds.version>2.1.0</jclouds.version>
+		<maven.compiler.source>1.6</maven.compiler.source>
+		<maven.compiler.target>1.6</maven.compiler.target>
 	</properties>
   
 	<dependencies>

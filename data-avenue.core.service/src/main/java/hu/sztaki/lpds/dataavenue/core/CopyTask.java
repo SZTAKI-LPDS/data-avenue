@@ -116,7 +116,7 @@ class CopyTask implements Callable<Void> {
 		        		}
 
 		        		isTargetSessionCreated = true;
-		        	} catch (CredentialException | OperationException | URIException e) {
+		        	} catch (Exception e) {
 		        		// there was an exception, so the file prolly does not exist, if yes, the copy will fail for similar reason :)
 		        		log.debug("Exception during readability check: " + e.getClass().getName() + " " + e.getMessage() + " ");
 		        	} // silently ignore readability exceptions
