@@ -16,6 +16,8 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CopyObjectRequest;
@@ -94,7 +96,8 @@ class S3CopyTask implements Callable<Void> {
 				clients = new S3Clients().withClient(source, sourceAccessKey, sourceSecretKey);
 				AmazonS3Client sourceClient = clients.get(source);
 				
-				if (sameClient) {
+				// in case of move we cannot know when copy is done and so safe to delete (long time transfer throws sockettimeoutexception)
+				if (sameClient && !isMove) {
 					
 					log.debug("Same host " + (isMove?"move: ":"copy: ") +  source.getURI() + " -> " + target.getURI());
 					
@@ -120,24 +123,31 @@ class S3CopyTask implements Callable<Void> {
 						
 					CopyObjectResult result = null;
 					try { 
+						log.trace("Requesting server-side copy");
 						result = sourceClient.copyObject(copyObjRequest);
+						log.trace("Requesting sent: " + result);
 						if (sourceMetadata != null) {
 							monitor.setBytesTransferred(sourceMetadata.getContentLength());
-							// notfify bytes transferred
+							// notify bytes transferred
 							monitor.notifyBytesTransferredIncrement(sourceMetadata.getContentLength());
 						}
-					} catch (AmazonS3Exception e) { 
+					} catch (AmazonServiceException e) { 
 						throw new OperationException("Source file does not exist!"); 
+					} catch (AmazonClientException x) { // thrown by
+						log.error("AmazonClientException at server-side copy");
+						// FIXME if SocketException, then the copy will be done later
+						x.printStackTrace();
+						// what to do???
 					}
 						
 					if (result == null) {
-						throw new OperationException("Couldn't copy file!");
+						throw new OperationException("Server-side copy object request failed");
 					} else {
 						if (isMove) sourceClient.deleteObject(new DeleteObjectRequest(source.getBucketName(), source.getPathWithinBucket().substring(1))); // delete original object, omit first slash
 						monitor.done();
 					}
 					
-				} else { // not the same client (different hosts)
+				} else { // not the same client (different hosts) or move
 					
 					log.debug((isMove?"move: ":"copy: ") +  source.getURI() + " -> " + target.getURI() + " overwrite: " + overwrite);
 					clients.add(target, targetCredentials.getCredentialAttribute("UserID"), targetCredentials.getCredentialAttribute("UserPass"));
@@ -225,7 +235,10 @@ class S3CopyTask implements Callable<Void> {
 			        }
 				}
 			} // if not cancelled
-		} catch (Exception e) { monitor.failed(e.getMessage() + (e.getCause() != null ? " (" + e.getCause() + ")" : "")); }
+		} catch (Exception e) {
+			e.printStackTrace();
+			monitor.failed(e.getMessage() + (e.getCause() != null ? " (" + e.getCause() + ")" : "")); 
+		}
 		finally { if (clients != null) clients.close(); }
 		
         container.finished(id); // remove this task from active tasks
