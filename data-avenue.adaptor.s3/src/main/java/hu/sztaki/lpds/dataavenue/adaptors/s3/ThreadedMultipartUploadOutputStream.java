@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +54,15 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 	private byte currentReadBuffer []; // initial read buffer
 	private int currentReadBufferContentLength;
 	
+	private AtomicBoolean error = new AtomicBoolean(false);
+	private String errorMsg = null;
+	
+	
 	ThreadedMultipartUploadOutputStream(final AmazonS3Client s3Client, final String bucketName, final String keyName, final int partSize, final int numberOfThreads, final long contentLength) throws OperationException {
 		log.trace("New ThreadedMultipartUploadOutputStream (part size: " + partSize + ", threads: " + numberOfThreads + ")");
 		UPLOAD_THREADS = numberOfThreads;
 		PART_SIZE = partSize;
-//		log.trace("Creating threaded multipart S3 upload (part size: {}, threads: {})...", PART_SIZE, UPLOAD_THREADS);
+		
 		this.uploadPool = Executors.newFixedThreadPool(UPLOAD_THREADS);
 		this.slotThreads = new Future<?> [UPLOAD_THREADS];
 		this.slotBuffers = new byte [UPLOAD_THREADS][];
@@ -74,7 +79,7 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 	        }
 	        InitiateMultipartUploadResult initResponse = s3Client.initiateMultipartUpload(initRequest);
 	        this.uploadId = initResponse.getUploadId();
-//			log.trace("MultipartUploadOutputStream created: " + uploadId);
+	        
 		}  catch (Throwable e) {
 			log.error("Cannot initiate multipart upload!");
 			abort(e);
@@ -88,9 +93,14 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 		currentReadBuffer = slotBuffers[currentReadSlot];
 	}
 	
+	private void error(String msg) {
+		if (error.getAndSet(true)) return;
+		errorMsg = msg;
+	}
+	
 	@Override public void write(byte b[], int off, int len) throws IOException { // NOTE: does not check parameters
-//		assert (len <= PART_SIZE): "Buffer cannot be greater than part size"; // so if buffer does not fit into part, the remaining will fit into the next one  
-
+		if (error.get()) throw new IOException(errorMsg);
+			
 		if (currentReadBufferContentLength + len < PART_SIZE) { // buffer fits into part
 			System.arraycopy(b, off, currentReadBuffer, currentReadBufferContentLength, len);
 			currentReadBufferContentLength += len;
@@ -100,7 +110,6 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 				System.arraycopy(b, off, currentReadBuffer, currentReadBufferContentLength, consumedLen);
 				currentReadBufferContentLength += consumedLen; // must be equal to PART_SIZE
 				
-//				assert(currentReadBufferContentLength == PART_SIZE);
 				writePart(partNumber++, currentReadBuffer, currentReadBufferContentLength);
 				currentReadBuffer = slotBuffers[this.currentReadSlot];
 				if (currentReadBuffer == null) currentReadBuffer = slotBuffers[this.currentReadSlot] = new byte [PART_SIZE];
@@ -123,6 +132,8 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 	
 	// don't use it 
 	@Override public void write(int b) throws IOException { // no need to synchronize, one thread writes this stream, and blocks until write returns
+		if (error.get()) throw new IOException(errorMsg);
+
 		try {
 			if (currentReadBufferContentLength == PART_SIZE) { // flush: upload part
 				writePart(partNumber++, currentReadBuffer, currentReadBufferContentLength);
@@ -139,8 +150,6 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 	}
 
 	@Override public void close() throws IOException {
-//		log.trace("Closing multipart upload...");
-		
 		// flush buffer if it contains any data
 		try {
 			if (currentReadBufferContentLength > 0) writePart(partNumber++, currentReadBuffer, currentReadBufferContentLength); // returned buffer not needed
@@ -153,14 +162,13 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 		// wait for upload tasks completion
 		uploadPool.shutdown();
 		
-		// TODO check thread exceptions
+		// check thread exceptions
+		checkThreadExceptions();
 		
 		try { uploadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); } 
 		catch (InterruptedException e) { System.out.println("Can't wait... (" + e.getMessage() + ")"); }
 		
-		// complete multipart upload
 		try {
-//			log.trace("Finalizing multipart upload...");
 	        CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(bucketName, keyName, uploadId, partETags);
 	        s3Client.completeMultipartUpload(compRequest);
 		}  catch (Throwable e) {
@@ -177,7 +185,7 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 	/*
 	 * 	modifies currentReadSlot index
 	 */
-	private void writePart(final int partNumber, final byte[] writeBuffer, final int contentLength) throws Exception {
+	private void writePart(final int partNumber, final byte[] writeBuffer, final int contentLength) {
 		// upload part in thread and add response to our list
 		if (partNumber % 10 == 0) log.debug("Writing part {} (slot {})", partNumber, currentReadSlot + 1);
 		slotThreads[currentReadSlot] = uploadPool.submit(new ThreadedPartUpload(this, partNumber, writeBuffer, contentLength, partETags));
@@ -199,14 +207,14 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 		} while (this.currentReadSlot == -1);
 	} 
 
-//	private void checkThreadExceptions() throws Exception {
-//		for (int i = 0; i < slotThreads.length; i++) {
-//			if (slotThreads[i] != null) {
-//				try { slotThreads[i].get(); }
-//				catch (Exception e) { throw new Exception(e); }
-//			}
-//		}
-//	}
+	private void checkThreadExceptions() {
+		for (int i = 0; i < slotThreads.length; i++) {
+			if (slotThreads[i] != null) {
+				try { slotThreads[i].get(); }
+				catch (Exception e) { log.debug("Slot thread exception: " + e.getMessage()); }
+			}
+		}
+	}
 	
 	private void abort(Throwable e) { // on any exception
 		log.error("Aborting upload output stream: " + bucketName + "/" + keyName, e);
@@ -239,7 +247,6 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 
 		@Override public void run() {
 			try {
-					
 				UploadPartRequest uploadRequest = new UploadPartRequest()
 			  	.withBucketName(parent.bucketName)
 			  	.withKey(parent.keyName)
@@ -253,6 +260,7 @@ public class ThreadedMultipartUploadOutputStream extends OutputStream {
 				if (partNumber % 10 == 0) log.debug("Part " + partNumber + " done");
 			
 			} catch (Throwable e) {
+				parent.error(e.getMessage());
 				log.error(e.getMessage(), e);
 			}
 		}
