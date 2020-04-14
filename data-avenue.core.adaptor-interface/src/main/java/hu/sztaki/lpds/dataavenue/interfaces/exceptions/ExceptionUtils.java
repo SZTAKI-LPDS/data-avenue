@@ -13,7 +13,7 @@ public abstract class ExceptionUtils {
 		}
 		
 		Throwable causeException = e.getCause();
-		if (causeException != null && causeException.equals(e.getMessage())) {
+		if (causeException != null && !causeException.getMessage().equals(e.getMessage())) {
 			result.append(", caused by: ");
 			while (causeException != null) {
 				result.append(causeException.getMessage());

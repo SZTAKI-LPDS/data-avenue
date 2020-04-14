@@ -96,8 +96,9 @@ class S3CopyTask implements Callable<Void> {
 				clients = new S3Clients().withClient(source, sourceAccessKey, sourceSecretKey);
 				AmazonS3Client sourceClient = clients.get(source);
 				
-				// in case of move we cannot know when copy is done and so safe to delete (long time transfer throws sockettimeoutexception)
-				if (sameClient && !isMove) {
+				if (sameClient) {
+					// in case of move we cannot know when copy is done and so safe to delete (long time transfer throws sockettimeoutexception)
+					if (isMove) throw new OperationException("Move operation is not supported when using server-side transfer");
 					
 					log.debug("Same host " + (isMove?"move: ":"copy: ") +  source.getURI() + " -> " + target.getURI());
 					
@@ -124,7 +125,7 @@ class S3CopyTask implements Callable<Void> {
 					CopyObjectResult result = null;
 					try { 
 						log.trace("Requesting server-side copy");
-						result = sourceClient.copyObject(copyObjRequest);
+						result = sourceClient.copyObject(copyObjRequest); // FIXME monitor?
 						log.trace("Requesting sent: " + result);
 						if (sourceMetadata != null) {
 							monitor.setBytesTransferred(sourceMetadata.getContentLength());

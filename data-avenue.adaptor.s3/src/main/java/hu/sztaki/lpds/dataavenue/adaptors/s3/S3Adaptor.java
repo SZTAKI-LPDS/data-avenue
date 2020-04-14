@@ -240,7 +240,7 @@ public class S3Adaptor implements Adaptor, DirectURLsSupported {
 					if (bucket.getName().equals(s3Uri.getBucketName())) {
 						if (bucket.getCreationDate() != null) s3Uri.setLastModified(bucket.getCreationDate().getTime());
 						try { s3Uri.setPermissions(getPermissions(client.getBucketAcl(bucket.getName()))); } catch (Exception e) {} // not permitted to query bucket ACL
-						s3Uri.setDetails(bucket.getOwner() != null && !"".equals(bucket.getOwner())? "Owner: " + bucket.getOwner().getDisplayName() + " (" + bucket.getOwner().getId() + ")" : null);
+						s3Uri.setDetails(bucket.getOwner() != null && !"".equals(bucket.getOwner().getDisplayName())? "Owner: " + bucket.getOwner().getDisplayName() + " (" + bucket.getOwner().getId() + ")" : null);
 						s3Uri.setSize(0l); // buckets has 0 size
 						return s3Uri;
 					}
@@ -264,7 +264,7 @@ public class S3Adaptor implements Adaptor, DirectURLsSupported {
 			    */
 			    AccessControlList acl = client.getObjectAcl(s3Uri.getBucketName(), s3Uri.getPathWithinBucket().substring(1));
 			    try { s3Uri.setPermissions(getPermissions(acl)); } catch (Exception e) {} // not permitted to query bucket ACL
-			    if (acl.getOwner() != null && !"".equals(acl.getOwner())) s3Uri.setDetails("Owner: " + acl.getOwner().getDisplayName() + " (" + acl.getOwner().getId() + ")");
+			    if (acl.getOwner() != null && !"".equals(acl.getOwner().getDisplayName())) s3Uri.setDetails("Owner: " + acl.getOwner().getDisplayName() + " (" + acl.getOwner().getId() + ")");
 			    return s3Uri;
 			}
 		}
@@ -290,7 +290,7 @@ public class S3Adaptor implements Adaptor, DirectURLsSupported {
 					S3URIImpl bucketURI = new S3URIImpl(s3Uri.getURI() + bucket.getName() + (!bucket.getName().endsWith(S3URIImpl.DELIMITER) ? S3URIImpl.DELIMITER : "") ); 
 					if (bucket.getCreationDate() != null) bucketURI.setLastModified(bucket.getCreationDate().getTime());
 					try { bucketURI.setPermissions(getPermissions(client.getBucketAcl(bucket.getName()))); } catch (Exception e) {} // not permitted to query bucket ACL
-					bucketURI.setDetails(bucket.getOwner() != null && !"".equals(bucket.getOwner())? "Owner: " + bucket.getOwner().getDisplayName() + " (" + bucket.getOwner().getId() + ")" : null);
+					bucketURI.setDetails(bucket.getOwner() != null && !"".equals(bucket.getOwner().getDisplayName())? "Owner: " + bucket.getOwner().getDisplayName() + " (" + bucket.getOwner().getId() + ")" : null);
 					bucketURI.setSize(0l); // buckets has 0 size
 					result.add(bucketURI);
 				}
@@ -337,7 +337,7 @@ public class S3Adaptor implements Adaptor, DirectURLsSupported {
 					    if (objectSummary.getSize() >= 0) objectUri.setSize(objectSummary.getSize());
 						if (objectSummary.getLastModified() != null) objectUri.setLastModified(objectSummary.getLastModified().getTime());
 						try { objectUri.setPermissions(getPermissions(client.getObjectAcl(s3Uri.getBucketName(), key))); } catch (Exception e) {} // not permitted to query bucket ACL
-						if (objectSummary.getOwner() != null && !"".equals(objectSummary.getOwner())) objectUri.setDetails("Owner: " + objectSummary.getOwner().getDisplayName() + " (" + objectSummary.getOwner().getId() + ")");
+						if (objectSummary.getOwner() != null && !"".equals(objectSummary.getOwner().getDisplayName())) objectUri.setDetails("Owner: " + objectSummary.getOwner().getDisplayName() + " (" + objectSummary.getOwner().getId() + ")");
 						result.add(objectUri);
 					}
 					// truncated result?
