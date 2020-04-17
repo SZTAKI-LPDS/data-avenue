@@ -135,18 +135,16 @@ class S3CopyTask implements Callable<Void> {
 					} catch (AmazonServiceException e) { 
 						throw new OperationException("Source file does not exist!"); 
 					} catch (AmazonClientException x) { // thrown by
-						log.error("AmazonClientException at server-side copy");
+						log.error("AmazonClientException at server-side copy " + x.getMessage());
 						// FIXME if SocketException, then the copy will be done later
 						x.printStackTrace();
 						// what to do???
 					}
 						
-					if (result == null) {
-						throw new OperationException("Server-side copy object request failed");
-					} else {
-						if (isMove) sourceClient.deleteObject(new DeleteObjectRequest(source.getBucketName(), source.getPathWithinBucket().substring(1))); // delete original object, omit first slash
-						monitor.done();
-					}
+					if (result == null) log.warn("null result from sourceClient.copyObject at server-side copy");
+					if (isMove) sourceClient.deleteObject(new DeleteObjectRequest(source.getBucketName(), source.getPathWithinBucket().substring(1))); // delete original object, omit first slash
+
+					monitor.done();
 					
 				} else { // not the same client (different hosts) or move
 					
