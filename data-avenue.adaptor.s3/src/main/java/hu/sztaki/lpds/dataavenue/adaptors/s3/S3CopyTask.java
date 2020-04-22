@@ -121,29 +121,30 @@ class S3CopyTask implements Callable<Void> {
 	
 					CopyObjectRequest copyObjRequest;
 					copyObjRequest = new CopyObjectRequest(source.getBucketName(), source.getPathWithinBucket().substring(1), target.getBucketName(), target.getPathWithinBucket().substring(1));
-						
+					
 					CopyObjectResult result = null;
 					try { 
 						log.trace("Requesting server-side copy");
-						result = sourceClient.copyObject(copyObjRequest); // FIXME monitor?
+						result = sourceClient.copyObject(copyObjRequest);
 						log.trace("Requesting sent: " + result);
 						if (sourceMetadata != null) {
 							monitor.setBytesTransferred(sourceMetadata.getContentLength());
 							// notify bytes transferred
 							monitor.notifyBytesTransferredIncrement(sourceMetadata.getContentLength());
 						}
+						
 					} catch (AmazonServiceException e) { 
 						throw new OperationException("Source file does not exist!"); 
 					} catch (AmazonClientException x) { // thrown by
-						log.error("AmazonClientException at server-side copy " + x.getMessage());
+						log.error("AmazonClientException at server-side copy " + x);
+						// AmazonClientException at server-side copy Unable to execute HTTP request: Read timed out (pool-60-thread-3)
 						// FIXME if SocketException, then the copy will be done later
-						x.printStackTrace();
-						// what to do???
+						if (x != null && x.getMessage() != null && x.getMessage().contains("Read timed out")) {} // ok, copy might be finished later
+						else { throw new OperationException("Server-side copy failed", x); }
 					}
 						
 					if (result == null) log.warn("null result from sourceClient.copyObject at server-side copy");
 					if (isMove) sourceClient.deleteObject(new DeleteObjectRequest(source.getBucketName(), source.getPathWithinBucket().substring(1))); // delete original object, omit first slash
-
 					monitor.done();
 					
 				} else { // not the same client (different hosts) or move
