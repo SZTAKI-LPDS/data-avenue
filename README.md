@@ -1,5 +1,3 @@
-# IN ALPHA TESTING
-
 # Data Avenue
 
 ## About
