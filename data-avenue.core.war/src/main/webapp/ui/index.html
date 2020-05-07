@@ -3,12 +3,36 @@
 <head>
   <meta charset="utf-8">
   <title>Data Avenue</title>
-  <base href="/dataavenue/ui/">
+  <base href="">
   <!-- dataavenue/"  -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script type="text/javascript">
+    function daSelect() {
+      var defaultUrl = document.getElementById('url').value;
+      var selectMode = 'f'; // 'f' = select file only; 'd' = select directory only; 'fd' = select file or directory
+      var authenticationReset = false; // if true, then the second load of the same url requires the authentication again
+      window.angularComponentReference.zone.run(() => {
+        window.angularComponentReference.daSelect(defaultUrl, selectMode, authenticationReset, callBackDaSelect);
+      });
+    }
+
+    function callBackDaSelect(returnedUrl, returnedCredential){
+      document.getElementById('url').value = returnedUrl;
+      document.getElementById('credential').innerHTML =   returnedCredential;
+    }
+  </script>
 <link rel="stylesheet" href="styles.3ff695c00d717f2d2a11.css"></head>
 <body>
-<app-root></app-root>
-<script src="runtime-es2015.edb2fcf2778e7bf1d426.js" type="module"></script><script src="runtime-es5.edb2fcf2778e7bf1d426.js" nomodule defer></script><script src="polyfills-es5.9283c13218e48104f6e3.js" nomodule defer></script><script src="polyfills-es2015.0a631ecea0a7f51e0c81.js" type="module"></script><script src="main-es2015.8638d646a0f85cd95079.js" type="module"></script><script src="main-es5.8638d646a0f85cd95079.js" nomodule defer></script></body>
+
+<!-- Comment it out to test the file chooser mode -->
+<dataavenue-gui browsermode="2panel" baseurl="" authkey="" advancedmode="false"></dataavenue-gui>
+<!-- Uncomment to test the file chooser mode -->
+<!--
+<dataavenue-gui browsermode="select" baseurl="" authkey="" advancedmode="false"></dataavenue-gui>
+<input type="text" id="url" value="http://mirror.niif.hu/ubuntu/" >
+<button type="button" onclick="daSelect();">Select file or directory with Data Avenue</button>
+<span id="credential"></span>
+-->
+<script src="runtime-es2015.c5fa8325f89fc516600b.js" type="module"></script><script src="runtime-es5.c5fa8325f89fc516600b.js" nomodule defer></script><script src="polyfills-es5.6c4a1f933542365805ae.js" nomodule defer></script><script src="polyfills-es2015.666181b99ef1cbaeb2fd.js" type="module"></script><script src="main-es2015.0b6cefe4287396ef89e6.js" type="module"></script><script src="main-es5.0b6cefe4287396ef89e6.js" nomodule defer></script></body>
 </html>

@@ -15,6 +15,10 @@ Developed by the [Laboratory of Parallel and Distributed Systems](https://www.sz
 
 2020, [Apache license](LICENSE)
 
+## What's new
+
+06/05/2020 Data Avenue GUI as file chooser dialog (see: [file-chooser-example.html](data-avenue.core.war/src/main/webapp/ui/file-chooser-example.html)) 
+
 ## Publications, projects
 
 - Akos Hajnal, Eniko Nagy, Peter Kacsuk and Istvan Marton: Data Migration for Large Scientific Datasets in Clouds, Azerbaijan Journal of High Performance Computing, Vol 1, Issue 1, 2018, pp. 66-86, https://doi.org/10.32010/26166127.2018.1.1.66.86
@@ -40,7 +44,7 @@ On Ubuntu (similar in other distros):
 
 ``cd data-avenue``
 
-``mvn clean package``
+``mvn package``
 
 ``cp data-avenue.core.war/target/dataavenue.war data-avenue.docker-compose/dataavenue/webapps/``
 
