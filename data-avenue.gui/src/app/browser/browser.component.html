@@ -1,4 +1,4 @@
-<ngb-tabset type="tabs" (tabChange)="beforeTabChange($event)">
+<ngb-tabset type="tabs" *ngIf="daService.enablePanels" (tabChange)="beforeTabChange($event)">
   <ngb-tab id="tab-main">
     <ng-template ngbTabTitle><b>Main</b></ng-template>
     <ng-template ngbTabContent>
@@ -101,7 +101,7 @@
                     (click)="onSel(elem, $event, i, LEFT)"
                     (dblclick)="onCD(elem, LEFT)">
                   <td class="{{ getType(elem.name) }}">{{ elem.name }}</td>
-                  <td *ngIf="isDetailed[LEFT]">{{ formatSize(elem.size)}}</td>
+                  <td *ngIf="isDetailed[LEFT]">{{ elem.size}}</td>
                   <td *ngIf="isDetailed[LEFT]">{{ elem.date | date:'yyyy.MM.dd. HH:mm' }}</td>
                   <!-- <td *ngIf="isDetailed[LEFT]">{{ elem.perm }}</td> -->
                 </tr>
@@ -148,7 +148,7 @@
                     (click)="onSel(elem, $event, i, RIGHT)"
                     (dblclick)="onCD(elem, RIGHT)">
                   <td class="{{ getType(elem.name) }}">{{ elem.name }}</td>
-                  <td *ngIf="isDetailed[RIGHT]">{{ formatSize(elem.size)}}</td>
+                  <td *ngIf="isDetailed[RIGHT]">{{ elem.size}}</td>
                   <td *ngIf="isDetailed[RIGHT]">{{ elem.date | date:'yyyy.MM.dd. HH:mm' }}</td>
                   <!-- <td *ngIf="isDetailed[RIGHT]">{{ elem.perm }}</td> -->
                 </tr>
@@ -332,7 +332,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let ts of transferStatusList">
+            <tr *ngFor="let ts of transferStatusList" data-toggle="tooltip" data-placement="bottom" title="{{ts.failure}}">
               <td>{{ts.source}}</td>
               <td>{{ts.target}}</td>
               <td style="white-space: nowrap">

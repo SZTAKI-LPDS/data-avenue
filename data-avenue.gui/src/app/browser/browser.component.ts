@@ -1,5 +1,5 @@
 import {AboutComponent} from '../about/about.component';
-import {ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit, ViewChild, NgZone} from '@angular/core';
 import {ModalDismissReasons, NgbModal, NgbTabChangeEvent} from '@ng-bootstrap/ng-bootstrap';
 import {FileItem, FileUploader, ParsedResponseHeaders} from 'ng2-file-upload';
 import {saveAs} from 'file-saver';
@@ -16,7 +16,7 @@ import {TransferStatus} from '../transferstatus';
 @Component({
   selector: 'app-browser',
   templateUrl: './browser.component.html',
-  styleUrls: ['./browser.component.css']
+  styleUrls: ['./browser.component.css', '../shared.css']
 })
 
 export class BrowserComponent implements OnInit {
@@ -65,10 +65,10 @@ export class BrowserComponent implements OnInit {
   BTN_CANCEL = 0;
 
 
-  constructor(private modalService: NgbModal,
+  constructor(public modalService: NgbModal,
               public daService: DaService,
-              private messageService: MessageService,
-              private changeDetector: ChangeDetectorRef) {
+              public messageService: MessageService,
+              public changeDetector: ChangeDetectorRef) {
     // upload
     this.uploader.onAfterAddingFile = (file) => {
       console.log(file);
@@ -334,18 +334,26 @@ export class BrowserComponent implements OnInit {
     }
 
     if (this.daService.authList[side].isAuthenticated) {
-      this.getDirectoryList(this.selectedSide);
-    } else {
-      const protocol = this.getProtocolFromUrl(this.currentdDir[side]);
-      this.log('protocol: ' + protocol);
-      if (protocol == null) {
-        this.logTyp('Invalid url: ' + this.currentdDir[side], Msg.DANGER);
+      if (this.daService.authList[side].url.startsWith(this.currentdDir[side]) || this.currentdDir[side].startsWith(this.daService.authList[side].url)) {
+        this.getDirectoryList(this.selectedSide);
       } else {
-        if (this.isProtocolSupported(protocol)) {
-          this.openAuth();
-        } else {
-          this.logTyp('The protocol ' + protocol + ' is not supported!', Msg.DANGER);
-        }
+        this.authenticate(side);
+      }
+    } else {
+      this.authenticate(side);
+    }
+  }
+
+  private authenticate(side: number) {
+    const protocol = this.getProtocolFromUrl(this.currentdDir[side]);
+    this.log('protocol: ' + protocol);
+    if (protocol == null) {
+      this.logTyp('Invalid url: ' + this.currentdDir[side], Msg.DANGER);
+    } else {
+      if (this.isProtocolSupported(protocol)) {
+        this.openAuth();
+      } else {
+        this.logTyp('The protocol ' + protocol + ' is not supported!', Msg.DANGER);
       }
     }
   }
@@ -769,10 +777,18 @@ export class BrowserComponent implements OnInit {
         .subscribe(dirList => {
             this.isLoad[side] = false;
 
+            const dirList2: Item[] = [];
+            let index = 0;
             if (dirList.length > 0 && dirList[0].name.endsWith('../')) {
-              dirList.shift(); // in case of http ../ is in the list
+              index = 1; // in case of http ../ is in the list
             }
-            this.dirList[side] = dirList;
+            for (; index < dirList.length; index++) {
+              let item = dirList[index];
+              item.size = this.formatSize(item.size);
+              dirList2.push(item);
+            }
+
+            this.dirList[side] = dirList2;
           },
           error => {
             this.isLoad[side] = false;
@@ -793,7 +809,7 @@ export class BrowserComponent implements OnInit {
             }
             for (; index < dirList.length; index++) {
               const name: string = dirList[index];
-              dirList2.push({name: name, date: 0, size: 0, sel: false});
+              dirList2.push({name: name, date: 0, size: null, sel: false});
             }
             this.dirList[side] = dirList2;
           },
@@ -892,8 +908,9 @@ export class BrowserComponent implements OnInit {
     return this.LEFT;
   }
 
-  formatSize(size: number): string {
-    if (size != null) {
+  formatSize(pSize: string): string {
+    if (pSize != null) {
+      let size = Number(pSize);
       if (size < 1024) {
         return size + ' B';
       } else if (size < 1048576) {

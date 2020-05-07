@@ -12,18 +12,35 @@ import {throwError} from "rxjs";
 
 @Injectable()
 export class DaService {
-
-  constructor(
-    private http: HttpClient,
-    private messageService: MessageService) {
-  }
+  C_BROWSER_MODE = 'browsermode';
+  C_BASE_URL = 'baseurl';
+  C_AUTH_KEY = 'authkey';
+  C_ADVANCED_MODE = 'advancedmode';
 
   daBaseUrl = '/dataavenue/';
   daAuthKey = 'dataavenue-key';
   daAdvancedMode = false;
 
+  enablePanels = true;
+
   authList: Auth[] = [{type: '', displayName: '', fields: [], url: '', xcredentials: '', isAuthenticated: false},
     {type: '', displayName: '', fields: [], url: '', xcredentials: '', isAuthenticated: false}]; // [side]
+
+  constructor(
+    private http: HttpClient,
+    private messageService: MessageService) {
+
+    const urlParams = this.getUrlParams(location.href);
+    if (urlParams[this.C_BASE_URL] != null) {
+      const pDaBaseUrl : string = urlParams[this.C_BASE_URL];
+      console.log("url parameter config - baseurl: :" + pDaBaseUrl);
+      if (pDaBaseUrl.endsWith('/')){
+        this.daBaseUrl = pDaBaseUrl;
+      } else {
+        this.daBaseUrl = pDaBaseUrl + '/';
+      }
+    }
+  }
 
   getVersion(): Observable<string | {}> {
     return this.http.get(this.daBaseUrl + 'rest/version', {responseType: 'text'})
@@ -259,7 +276,25 @@ export class DaService {
       return throwError(` ${error.error} Error code ${error.status}`);
     }
   }
-  
+
+  /**
+   * https://www.malcontentboffin.com/2016/11/TypeScript-Function-Decodes-URL-Parameters.html
+   * @param url
+   */
+  getUrlParams(url?: string): any {
+    const params = {};
+    const splitted = url.split("?", 2);
+    if (splitted.length == 2) {
+      const urlParams = splitted[1].split("&");
+      urlParams.forEach((indexQuery: string) => {
+        const keyValue = indexQuery.split("=");
+        const key = decodeURIComponent(keyValue[0]);
+        const value = decodeURIComponent(keyValue.length > 1 ? keyValue[1] : "");
+        params[key] = value;
+      });
+    }
+    return params;
+  }
 
   private log(message: string) {
     this.messageService.add('DA Service: ' + message, this.daAdvancedMode);

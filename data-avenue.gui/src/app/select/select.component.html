@@ -1,0 +1,97 @@
+<ng-template #modalselect let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">{{modalTitle}}
+    </h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="input-group input-group-sm">
+      <input type="text" class="form-control"
+             [(ngModel)]="currentdDir[LEFT]"
+             disabled/>
+      <div class="input-group-append">
+        <div class="input-group-text">
+          <input type="checkbox"
+                 data-toggle="tooltip" data-placement="bottom" title="Details"
+                 [disabled]="!daService.authList[LEFT].isAuthenticated"
+                 [(ngModel)]="isDetailed[LEFT]"
+                 (change)="onUrlSelected(LEFT)"/>
+        </div>
+      </div>
+    </div>
+
+    <table style="width: 100%">
+      <tr>
+        <td class="top">
+          <div class="loader-container" [style.height.px]="height" [style.max-height.px]="height"
+               [hidden]="!isLoad[LEFT]">
+            Loading...<br> <br>
+            <div [ngClass]="{'loader': isLoad[LEFT]}"></div>
+            <br>
+          </div>
+          <div class="panel"
+               [hidden]="isLoad[LEFT]"
+               [style.height.px]="height"
+               [style.max-height.px]="height"
+          >
+            <table class="filelist">
+              <thead>
+              <tr class="h">
+                <td>Name</td>
+                <td *ngIf="isDetailed[LEFT]">Size</td>
+                <td *ngIf="isDetailed[LEFT]">Date</td>
+                <!-- <td *ngIf="isDetailed[LEFT]">Permission</td> -->
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngIf="enablePrevDir(LEFT)"
+                  (dblclick)="onChangeDirToPrev(LEFT)"
+                  (click)="onSel(null, $event, -1, LEFT)">
+                <td class="d" [colSpan]="3">..</td>
+              </tr>
+              <tr class="p"
+                  *ngFor="let elem of dirList[LEFT]; let i = index"
+                  [ngClass]="{'s': elem.sel, 'i': activeIndex[LEFT] == i}"
+                  (click)="onSel(elem, $event, i, LEFT)"
+                  (dblclick)="onCD(elem, LEFT)">
+                <td class="{{ getType(elem.name) }}">{{ elem.name }}</td>
+                <td *ngIf="isDetailed[LEFT]">{{ elem.size}}</td>
+                <td *ngIf="isDetailed[LEFT]">{{ elem.date | date:'yyyy.MM.dd. HH:mm' }}</td>
+                <!-- <td *ngIf="isDetailed[LEFT]">{{ elem.perm }}</td> -->
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-info" (click)="openMkDir(modalmkdir)" [disabled]="isBtnMkDirDisabled()">
+      Make directory
+    </button>
+    <button type="button" class="btn btn-outline-dark" (click)="c(BTN_CANCEL)">Cancel</button>
+    <button type="button" class="btn btn-outline-success" [disabled]="isSelectOKDisabled()" (click)="c(BTN_OK)">Ok</button>
+  </div>
+</ng-template>
+
+<ng-template #modalmkdir let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Make directory</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Make directory in {{currentdDir[selectedSide]}}</p>
+    <p>
+      <input [(ngModel)]="mkdirName" placeholder="New directory name" (keypress)="isEnterPressed($event, c)"/>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="c(BTN_CANCEL)">Cancel</button>
+    <button type="button" class="btn btn-outline-success" (click)="c(BTN_OK)">Ok</button>
+  </div>
+</ng-template>

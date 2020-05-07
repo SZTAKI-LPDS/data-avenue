@@ -1,7 +1,8 @@
 <link rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
 
-<app-browser></app-browser>
+<app-browser *ngIf="daService.enablePanels"></app-browser>
+<app-select *ngIf="!daService.enablePanels"></app-select>
 <simple-notifications></simple-notifications>
 
 

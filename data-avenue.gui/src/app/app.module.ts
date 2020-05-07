@@ -15,6 +15,7 @@ import {SettingsComponent} from './settings/settings.component';
 import {AboutComponent} from './about/about.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {SimpleNotificationsModule} from 'angular2-notifications';
+import { SelectComponent } from './select/select.component';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import {SimpleNotificationsModule} from 'angular2-notifications';
     BrowserComponent,
     ModalAuthComponent,
     SettingsComponent,
-    AboutComponent
+    AboutComponent,
+    SelectComponent
   ],
   entryComponents: [ModalAuthComponent,
     SettingsComponent,
