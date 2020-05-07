@@ -11,6 +11,9 @@ and there is a clean **REST application programming interface** (API).
 
 Having Data Avenue you don't have to deal with downloading, installing, configuring, and getting to know the proper tools (e.g., command-line tools, proprietary tool, api libraries) to access a particular storage. Also, no worry about local disk space, when transferring huge amount of data from one storage to another. 
 
+Some overview slides about Data Avenue is available here: [DataAvenueOverview.pptx](docs/DataAvenueOverview.pptx). 
+
+
 Developed by the [Laboratory of Parallel and Distributed Systems](https://www.sztaki.hu/en/science/departments/lpds) (LPDS) of [Institute Computer Science and Control](http://www.sztaki.hu). 
 
 2020, [Apache license](LICENSE)
