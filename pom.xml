@@ -43,7 +43,7 @@
 		<module>data-avenue.core.adaptor-interface</module>
 		<module>data-avenue.adaptor.s3</module>
 		<module>data-avenue.adaptor.hdfs</module>
-		<module>data-avenue.adaptor.jclouds</module>
+		<module>data-avenue.adaptor.jclouds</module> <!-- jsaga's bcprov-jdk16-1.46.jar is in conflict with jclouds' bcprov-ext-jdk15on-1.51.jar, add to packagingExcludes WEB-INF/lib/bcprov-jdk16-1.46.jar, of core.war/pom.xml -->
 		<module>data-avenue.adaptor.gss</module>
 		<module>data-avenue.adaptor.cdmi</module>
 		<module>data-avenue.adaptor.cassandra</module>
