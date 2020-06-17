@@ -20,6 +20,8 @@ Developed by the [Laboratory of Parallel and Distributed Systems](https://www.sz
 
 ## What's new
 
+06/07/2020 Release v1.0
+
 06/05/2020 Data Avenue GUI as file chooser dialog (see: [file-chooser-example.html](data-avenue.core.war/src/main/webapp/ui/file-chooser-example.html)) 
 
 ## Publications, projects
