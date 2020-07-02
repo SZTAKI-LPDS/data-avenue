@@ -39,12 +39,12 @@
 		</dependency>
 	
 		<!-- Cassandra adaptor -->
-		<dependency>
+		<!-- dependency>
 			<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
 			<artifactId>data-avenue.adaptor.cassandra</artifactId>
 			<version>1.0.0</version>
 			<scope>runtime</scope>
-		</dependency>	
+		</dependency-->	
 		
 		<!-- Jclouds adaptor -->
 		<dependency>

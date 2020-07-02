@@ -69,7 +69,14 @@
 			<artifactId>azureblob</artifactId>
 			<version>${jclouds.version}</version>
 		</dependency>
-    
+
+		<!-- guava 18, if not set guava 16 will be used and throws no method exception at using reflections -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
+		    
 		<!-- generic SLF4J dependency -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
