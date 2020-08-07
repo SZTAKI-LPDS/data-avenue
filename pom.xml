@@ -47,6 +47,7 @@
 		<module>data-avenue.adaptor.gss</module>
 		<module>data-avenue.adaptor.cdmi</module>
 		<module>data-avenue.adaptor.cassandra</module>
+		<module>data-avenue.adaptor.dropbox</module>
 		<module>data-avenue.core.service</module>
 		<module>data-avenue.core.war</module>
   	</modules>
