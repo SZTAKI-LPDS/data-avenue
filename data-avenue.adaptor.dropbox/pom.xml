@@ -12,7 +12,6 @@
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding> <!-- prevents some warnings -->
 		<slf4j.version>1.7.2</slf4j.version> <!-- SLF4J version -->
-		<jclouds.version>2.1.0</jclouds.version>
 		<maven.compiler.source>1.6</maven.compiler.source>
 		<maven.compiler.target>1.6</maven.compiler.target>
 	</properties>
@@ -27,7 +26,7 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-drive -->
-		<dependency>
+		<dependency> <!-- FIXME delete -->
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-drive</artifactId>
 			<version>v3-rev105-1.23.0</version>
@@ -35,20 +34,20 @@
 
 
 		<!-- https://mvnrepository.com/artifact/com.google.api-client/google-api-client -->
-		<dependency>
+		<dependency> <!-- FIXME delete -->
 			<groupId>com.google.api-client</groupId>
 			<artifactId>google-api-client</artifactId>
 			<version>1.23.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-jetty -->
-		<dependency>
+		<dependency> <!-- FIXME delete -->
 			<groupId>com.google.oauth-client</groupId>
 			<artifactId>google-oauth-client-jetty</artifactId>
 			<version>1.23.0</version>
 		</dependency>
 
-		<dependency>
+		<dependency><!-- FIXME delete -->
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-client</artifactId>
 			<version>3.2.0</version>
@@ -80,7 +79,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>googledrive-adaptor</finalName>
+		<finalName>googledrive-adaptor</finalName><!--  FIXME -->
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
