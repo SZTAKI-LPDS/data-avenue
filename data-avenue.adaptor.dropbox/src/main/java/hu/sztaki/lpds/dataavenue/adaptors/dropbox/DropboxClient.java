@@ -14,8 +14,8 @@ public class DropboxClient  {
 	private final static Map<String, DbxClientV2> clients = new HashMap<String, DbxClientV2>(); // map: host -> client
 	
 	// Get the client from the dropbox, authentication process
-	DropboxClient withClient(final URIBase uri, final String access) throws IOException, GeneralSecurityException {
-		DbxRequestConfig config = new DbxRequestConfig("dropbox/Balintskac");
+	DropboxClient withClient(final URIBase uri, final String user, final String access) throws IOException, GeneralSecurityException {
+		DbxRequestConfig config = new DbxRequestConfig("dropbox/" + user); // FIXME ?
 		String hostAndPort = uri.getHost() + (uri.getPort() != null ? ":" + uri.getPort() : "");
 		clients.put(hostAndPort, new DbxClientV2(config, access));
 		return this;
