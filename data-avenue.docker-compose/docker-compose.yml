@@ -17,7 +17,7 @@ services:
     image: tomcat:7
     restart: always
     environment:
-      - JAVA_OPTS="-Djava.security.egd=file:///dev/urandom -Xmx2G -Xss800m"
+      - JAVA_OPTS="-Djava.security.egd=file:///dev/urandom -Xmx2G -Xss1G"
     depends_on:
       - dataavenue-database
     links:
