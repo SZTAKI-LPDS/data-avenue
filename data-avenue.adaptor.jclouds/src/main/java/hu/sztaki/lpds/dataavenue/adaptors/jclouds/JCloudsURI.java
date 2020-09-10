@@ -17,7 +17,10 @@ public class JCloudsURI extends DefaultURIBaseImpl {
 	JCloudsURI(final URIBase uri) throws URIException { super(uri);	}
 	JCloudsURI(final String uriString) throws URIException { super(uriString);	}
 	
+	// if AUTH_PREFIX is v3|v2|v1: returns protocol://host:port/AUTH_PREFIX
+	// if AUTH_PREFIX starts with http returns AUTH_PREFIX (whole auth URL)
 	static String getAuthEndpoint(final URIBase uri, final String protocol, final String authPrefix) {
+		if (authPrefix != null && authPrefix.startsWith("http")) return authPrefix;
 		String authPostfix = authPrefix != null ? (authPrefix.startsWith("/") ? "" : "/") + authPrefix : ""; 
 		String result = (protocol != null ? protocol : "https")	+ "://" 
 				+ uri.getHost()	+ (uri.getPort() != null ? ":" + uri.getPort() : "") 

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<base href="">
+	<title>Workflow configuration</title>
+
+	<!-- dataavenue  -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/x-icon" href="favicon.ico">
+	<link rel="stylesheet" href="styles.3ff695c00d717f2d2a11.css">
+	<script src="runtime-es2015.c5fa8325f89fc516600b.js" type="module"></script>
+	<script src="runtime-es5.c5fa8325f89fc516600b.js" nomodule defer></script>
+	<script src="polyfills-es5.6c4a1f933542365805ae.js" nomodule defer></script>
+	<script src="polyfills-es2015.666181b99ef1cbaeb2fd.js" type="module"></script>
+	<script src="main-es2015.0b6cefe4287396ef89e6.js" type="module"></script>
+	<script src="main-es5.0b6cefe4287396ef89e6.js" nomodule defer></script>
+
+	<script type="text/javascript">
+		function daSelect(protocol, host, uri, credentials, mode) {
+			var defaultUrl = document.getElementById(protocol).value + "://" + document.getElementById(host).value + "/";
+			var selectMode = mode; // 'f'; // 'f' = select file only; 'd' = select directory only; 'fd' = select file or directory
+			var authenticationReset = false; // if true, then the second load of the same url requires the authentication again
+			window.angularComponentReference.zone.run(() => {
+				window.angularComponentReference.daSelect(defaultUrl, selectMode, authenticationReset,
+					(returnedUrl, returnedCredential) => {
+						document.getElementById(uri).value = returnedUrl;
+						document.getElementById(credentials).value = returnedCredential;
+					})
+			});
+		}
+	</script>
+</head>
+
+<body>
+	<h2>Workflow name: Example</h2>
+	<fieldset>
+		<dataavenue-gui browsermode="select" baseurl="/v1/emgdata/" authkey="" advancedmode="false"></dataavenue-gui>
+	
+		<legend>Inputs</legend>
+		<table border="0">
+			<tr>
+				<td>
+					<label for="epochs">Number of epochs [integer]:</label></td>
+				<td><input type="text" name="epochs" placeholder="10" pattern="[0-9]{3}" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="rate">Learning rate [float]:</label></td>
+				<td><input type="text" name="rate" placeholder="0.3" pattern="[0-9]+([\.][0-9]{0,2})?" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Training data [file]:</label>
+				</td>
+				<td>
+					<input type="radio" name="fileParam1LocalOrRemote" id="fileParam1LocalRadio" value="local" checked
+						onclick="document.getElementById('fileParam1Remote').style.display='none';document.getElementById('fileParam1Local').style.display='block'" />
+					<label for="fileParam1LocalRadio">Local file</label>
+
+					<!-- local or remote file chooser -->
+					<input type="radio" name="fileParam1LocalOrRemote" id="fileParam1RemoteRadio" value="remote"
+						onclick="document.getElementById('fileParam1Local').style.display='none';document.getElementById('fileParam1Remote').style.display='block'" />
+					<label for="fileParam1RemoteRadio">Remote file</label>
+
+					<div id="fileParam1Local"><input type="file" name="fileParam1Local" /></div>
+
+					<div id="fileParam1Remote" style="display: none">
+						<select id="fileParam1Protocol">
+							<option value="http">http</option>
+							<option value="https">https</option>
+							<option value="s3">s3</option>
+							<option value="gss">gss</option>
+							<option value="sftp">sftp</option>
+							<option value="hdfs">hdfs</option>
+							<option value="swift">swift</option>
+							<option value="gsiftp">gsiftp</option>
+							<option value="irods">irods</option>
+							<option value="srm">srm</option>
+							<option value="lfn">lfn</option>
+						</select>
+
+						<input type="text" id="fileParam1Host" value="mirror.niif.hu" />
+						<button type="button"
+							onclick="daSelect('fileParam1Protocol', 'fileParam1Host', 'fileParam1Uri', 'fileParam1Credentials', 'f');">Choose
+							file</button>
+						<input type="text" id="fileParam1Uri" value="No file chosen" disabled style="border:none" />
+						<input type="text" id="fileParam1Credentials" value="{}" disabled style="border:none" hidden />
+					</div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+
+	<br /><br />
+
+	<fieldset>
+		<legend>Outputs</legend>
+		<table border="0">
+			<tr>
+				<td>
+					<label>Weights and biases [file]: </label>
+				</td>
+				<td>
+					<input type="radio" name="fileParam2LocalOrRemote" id="fileParam2LocalRadio" value="local" checked
+						onclick="document.getElementById('fileParam2Remote').style.display='none'" />
+					<label for="fileParam2LocalRadio">Download link</label>
+
+					<input type="radio" name="fileParam2LocalOrRemote" id="fileParam2RemoteRadio" value="remote"
+						onclick="document.getElementById('fileParam2Remote').style.display='block'" />
+					<label for="fileParam2RemoteRadio">Remote storage</label>
+
+					<!-- remote directory chooser -->
+					<div id="fileParam2Remote" style="display: none">
+						<select id="fileParam2Protocol">
+							<option value="http" selected>http</option>
+							<option value="https">https</option>
+							<option value="s3">s3</option>
+							<option value="gss">gss</option>
+							<option value="sftp">sftp</option>
+							<option value="hdfs">hdfs</option>
+							<option value="swift">swift</option>
+							<option value="gsiftp">gsiftp</option>
+							<option value="irods">irods</option>
+							<option value="srm">srm</option>
+							<option value="lfn">lfn</option>
+						</select>
+						<input type="text" id="fileParam2Host" value="mirror.niif.hu" />
+						<button type="button"
+							onclick="daSelect('fileParam2Protocol', 'fileParam2Host', 'fileParam2Uri', 'fileParam2Credentials', 'd');">Choose
+							directory</button>
+						<input type="text" id="fileParam2Uri" value="No directory chosen" disabled style="border:none" />
+						<input type="text" id="fileParam2Credentials" value="{}" disabled style="border:none" hidden />
+					</div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+
+	<br /><br />
+	<input type="submit" value="Start workflow" style="width:400px" />
+</body>
+
+</html>
