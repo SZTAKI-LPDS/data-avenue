@@ -75,7 +75,7 @@ public class S3URIImpl implements URIBase {
 	@Override public URIType getType() { return type; }
 	@Override public String getProtocol() { return uri.getProtocol(); }
 	@Override public String getHost() { return uri.getHost(); }
-	@Override public Integer getPort() { return uri.getPort() != -1 ? uri.getPort() : null; } // differs from Java URI implementation
+	@Override public Integer getPort() { return uri.getPort() != null && uri.getPort() != -1 ? uri.getPort() : null; } // differs from Java URI implementation
 	@Override public String getPath() {	return uri.getPath(); } // returns full path with bucketname
 	@Override public String getURI() { return uri.toString(); }
 	
