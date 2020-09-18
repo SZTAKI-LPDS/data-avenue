@@ -11,7 +11,7 @@ import hu.sztaki.lpds.dataavenue.interfaces.URIBase;
 
 public class DropboxClient  {
 
-	private final static Map<String, DbxClientV2> clients = new HashMap<String, DbxClientV2>(); // map: host -> client
+private final static Map<String, DbxClientV2> clients = new HashMap<String, DbxClientV2>(); // map: host -> client
 	
 	// Get the client from the dropbox, authentication process
 	DropboxClient withClient(final URIBase uri, final String user, final String access) throws IOException, GeneralSecurityException {
