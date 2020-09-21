@@ -59,6 +59,9 @@ public class DropboxAdaptor implements Adaptor {
 	static final String PROTOCOL_PREFIX = "dropbox";
 	static final String PROTOCOLS = "dropbox";
 	
+	static final String DROPBOX_CLIENT = "dropboxClient";
+	static final String DROPBOX_HOST = "dropbox.com";
+	
 //	static final List<String> APIS = new Vector<String>(); 
 //	static final List<String> PROVIDERS = new Vector<String>();
 
@@ -181,7 +184,42 @@ public class DropboxAdaptor implements Adaptor {
 	}
 
 	private DbxClientV2 getDropboxClient(URIBase uri, Credentials credentials, DataAvenueSession session)
-			throws OperationException, GeneralSecurityException, CredentialException {
+			throws URIException, OperationException, CredentialException {
+		
+		DbxClientV2 client = null;
+		
+		// try to get client from session...
+		if (session != null) {
+			client = (DbxClientV2) session.get(DROPBOX_CLIENT);
+			if (client != null)	return client;
+		}
+
+		// not found in session...
+		
+		// check uri
+		if (!DROPBOX_HOST.equals(uri.getHost()))
+			throw new URIException("Hostname must be: " + DROPBOX_HOST);
+		
+		// check credentials
+		if (credentials == null) 
+			throw new CredentialException("No credentials!");
+
+		String username = credentials.getCredentialAttribute(ACCESS_KEY_USERNAME);
+		String accessKey = credentials.getCredentialAttribute(ACCESS_KEY_CREDENTIAL);
+
+		if (username == null || accessKey == null) // check credentials
+			throw new CredentialException("Missing " + ACCESS_KEY_USERNAME + " and/or " + ACCESS_KEY_CREDENTIAL + " credentials!");
+
+		DbxRequestConfig config = new DbxRequestConfig("dropbox/" + username);
+		client = new DbxClientV2(config, accessKey); // FIXME no exception if wrong credentials??
+
+		// add newly created client to session, if there is session
+		if (session != null) 
+			session.put(DROPBOX_CLIENT, client);
+
+		return client;
+		
+		/*
 		DropboxClient clients = null; // FIXME
 		if (clients == null) {
 			if (credentials == null)
@@ -191,6 +229,7 @@ public class DropboxAdaptor implements Adaptor {
 			String accessKey = credentials.getCredentialAttribute(ACCESS_KEY_CREDENTIAL);
 
 			try {
+				
 				clients = new DropboxClient().withClient(uri, username, accessKey);
 			} catch (IOException x) {
 				throw new OperationException(x);
@@ -200,6 +239,7 @@ public class DropboxAdaptor implements Adaptor {
 		if (client == null)
 			throw new OperationException("APPLICATION ERROR: Cannot create Dropbox client!");
 		return client;
+		*/
 	}
 
 	@Override public List<URIBase> list(final URIBase uri, Credentials credentials, DataAvenueSession session)
