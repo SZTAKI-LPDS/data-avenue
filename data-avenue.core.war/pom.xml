@@ -70,6 +70,20 @@
 			<scope>runtime</scope>
 		</dependency>	
 		
+		<!-- Dropbox adaptor -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
+			<artifactId>data-avenue.adaptor.dropbox</artifactId>
+			<version>1.0.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- Google Drive adaptor -->
+		<dependency>
+			<groupId>hu.sztaki.lpds.dataavenue.adaptors</groupId>
+			<artifactId>data-avenue.adaptor.googledrive</artifactId>
+			<version>1.0.0</version>
+			<scope>runtime</scope>
+		</dependency>				
 		<!-- Override commons-logging:1.0.3 dependency and required runtime () -->
 		<dependency>
 			<!--  in conflict with commons-codec:1.3 <= amazon aws-->
