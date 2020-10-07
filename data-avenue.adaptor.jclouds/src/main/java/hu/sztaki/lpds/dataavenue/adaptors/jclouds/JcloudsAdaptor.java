@@ -181,7 +181,7 @@ public class JcloudsAdaptor implements Adaptor {
 			AuthenticationField f;
 
 			f = new AuthenticationFieldImpl();
-			f.setDisplayName("Authentication URL prefix (v3|v2|v1)");
+			f.setDisplayName("Authentication URL prefix (v3|v2|v1) or URL (http://keystone....:5000/v3)");
 			f.setKeyName(AUTH_PREFIX);
 			f.setDefaultValue("v3");
 			a.getFields().add(f);
@@ -713,6 +713,8 @@ public class JcloudsAdaptor implements Adaptor {
 			overrides.put(KeystoneProperties.KEYSTONE_VERSION, keystoneVersion);
 			overrides.put(KeystoneProperties.SCOPE, "domain:" + projectDomain);
 			overrides.put(KeystoneProperties.SCOPE, "project:" + projectName);
+			overrides.put(KeystoneProperties.CREDENTIAL_TYPE, "apiAccessKeyCredentials"); // FIXME ?
+			overrides.put("jclouds.wire.log.sensitive", "True");
 
 			String contextAPI = "openstack-swift";
 			String authPrefix = credentials.optCredentialAttribute(AUTH_PREFIX, "");
@@ -734,7 +736,7 @@ public class JcloudsAdaptor implements Adaptor {
 			
 			BlobStoreContext blobStoreContext = ContextBuilder.newBuilder(contextAPI)
 				.endpoint(endpoint)
-				.credentials(userDomain + ":" + username, password) // tenant:user
+				.credentials((!"".equals(userDomain) ? userDomain + ":" : "")+ username, password) // tenant:user
 				.overrides(overrides)
 				.modules(ImmutableSet.of(new SLF4JLoggingModule()))
 				.buildView(BlobStoreContext.class);
