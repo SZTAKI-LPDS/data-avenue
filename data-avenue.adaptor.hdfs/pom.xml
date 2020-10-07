@@ -15,6 +15,13 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 	</properties>
 
+	<licenses>
+	    <license>
+	      <name>The Apache Software License, Version 2.0</name>
+	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+	    </license>
+	</licenses>
+	
 	<dependencies>
 	
 		<!-- Data Avenue core interface -->
@@ -34,7 +41,7 @@
 
 		<!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-hdfs -->
 		<!-- Apache Hadoop 3.x now support only Java 8! -->
-		<!--  uses jersey 1.19 dependency !!! which is in conflict with others -->
+		<!-- uses jersey 1.19 dependency !!! which is in conflict with others -->
 		<dependency>
 		    <groupId>org.apache.hadoop</groupId>
 		    <artifactId>hadoop-hdfs</artifactId>
@@ -53,24 +60,12 @@
 		    <artifactId>jersey-server</artifactId>
 		    <version>2.17</version>
 		</dependency>
-		
-		<!--dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-core</artifactId>
-			<version>3.2.0</version>
-		</dependency-->
 
  		<dependency>
 		    <groupId>org.apache.hadoop</groupId>
 		    <artifactId>hadoop-client</artifactId>
 		    <version>3.2.0</version>
 		</dependency>
-
-		<!--dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-auth</artifactId>
-			<version>3.2.0</version>
-		</dependency-->		
 
  		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
@@ -92,12 +87,6 @@
 			<version>0.9.30</version> <!-- Tomcat6 supported till 0.9.30 -->
 		</dependency>
 
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20140107</version>
-		</dependency>
-		
 	</dependencies>
 
 	<build>
@@ -126,6 +115,18 @@
 					<downloadSources>true</downloadSources>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+
 		</plugins>
 	</build>
+	<description>Data Avenue Adaptor HDFS</description>
 </project>

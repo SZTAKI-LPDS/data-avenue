@@ -15,6 +15,13 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 	</properties>
 
+  	<licenses>
+	    <license>
+	      <name>The Apache Software License, Version 2.0</name>
+	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+	    </license>
+	</licenses>
+	
 	<dependencies>
 		<dependency>
 			<groupId>hu.sztaki.lpds.dataavenue.core</groupId>
@@ -74,6 +81,18 @@
 					<downloadSources>true</downloadSources>
 				</configuration>
 			</plugin>
+                                    <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
+
 		</plugins>
 	</build>
+	<description>Data Avenue Adaptor GSS</description>
 </project>                        

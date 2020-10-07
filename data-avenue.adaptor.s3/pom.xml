@@ -16,6 +16,13 @@
 		<maven.compiler.target>1.6</maven.compiler.target>
 	</properties>
 
+	<licenses>
+	    <license>
+	      <name>The Apache Software License, Version 2.0</name>
+	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+	    </license>
+	</licenses>
+	  
 	<dependencies>
 	
 		<!-- Data Avenue Core Interface -->
@@ -54,11 +61,11 @@
 			<version>0.9.30</version> <!-- Tomcat6 supported till 0.9.30 -->
 		</dependency>
 
-		<dependency>
+		<!-- dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20140107</version>
-		</dependency>
+		</dependency -->
 		
 	</dependencies>
 
@@ -88,6 +95,18 @@
 					<downloadSources>true</downloadSources>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
 		</plugins>
+
 	</build>
+	<description>Data Avenue Adaptor Amazon S3</description>
 </project>
