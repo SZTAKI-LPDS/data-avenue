@@ -6,16 +6,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.FolderMetadata;
 import com.dropbox.core.v2.files.ListFolderResult;
 import com.dropbox.core.v2.files.Metadata;
+import com.google.api.services.drive.Drive;
+
 import hu.sztaki.lpds.dataavenue.interfaces.Adaptor;
 import hu.sztaki.lpds.dataavenue.interfaces.AuthenticationField;
 import hu.sztaki.lpds.dataavenue.interfaces.AuthenticationType;
@@ -35,6 +44,12 @@ import hu.sztaki.lpds.dataavenue.interfaces.impl.AuthenticationTypeImpl;
 import hu.sztaki.lpds.dataavenue.interfaces.impl.AuthenticationTypeListImpl;
 import hu.sztaki.lpds.dataavenue.interfaces.impl.DefaultURIBaseImpl;
 
+/**
+ * @author Balint Rapolthy
+ * 
+ * Dropbox adaptor
+ *
+ */
 public class DropboxAdaptor implements Adaptor {
 
 	private static final Logger log = LoggerFactory.getLogger(DropboxAdaptor.class);
@@ -42,13 +57,11 @@ public class DropboxAdaptor implements Adaptor {
 	private String adaptorVersion = "1.0.0"; // default adaptor version
 
 	static final String PROTOCOL_PREFIX = "dropbox";
-	static final String PROTOCOLS = "dropbox";
 
 	static final String DROPBOX_CLIENT = "dropboxClient";
 	static final String DROPBOX_HOST = "dropbox.com";
 
-	static final String ACCESS_KEY_USERNAME = "accessKeyUserName"; // FIXME neve?
-	static final String ACCESS_KEY_CREDENTIAL = "accessToken"; // FIXME token credential?
+	static final String ACCESS_TOKEN = "accessToken";
 
 	public DropboxAdaptor() {
 		String PROPERTIES_FILE_NAME = "META-INF/data-avenue-adaptor.properties"; // try to read version number
@@ -95,7 +108,7 @@ public class DropboxAdaptor implements Adaptor {
 	@Override
 	public List<String> getSupportedProtocols() {
 		List<String> result = new Vector<String>();
-		result.add(PROTOCOLS);
+		result.add(PROTOCOL_PREFIX);
 		return result;
 	}
 
@@ -122,7 +135,7 @@ public class DropboxAdaptor implements Adaptor {
 	public List<String> getAuthenticationTypes(String protocol) {
 		List<String> result = new Vector<String>();
 		// for all protocols
-		result.add(ACCESS_KEY_CREDENTIAL);
+		result.add(ACCESS_TOKEN);
 		return result;
 	}
 
@@ -130,8 +143,8 @@ public class DropboxAdaptor implements Adaptor {
 	public String getAuthenticationTypeUsage(String protocol, String authenticationType) {
 		if (protocol == null || authenticationType == null)
 			throw new IllegalArgumentException("null argument");
-		if (ACCESS_KEY_CREDENTIAL.equals(authenticationType))
-			return "<b>" + ACCESS_KEY_USERNAME + "</b> (user name) <b>" + ACCESS_KEY_CREDENTIAL + "</b> (access key)"; // FIXME
+		if (ACCESS_TOKEN.equals(authenticationType))
+			return "<b>" + ACCESS_TOKEN + "</b> (access token)";
 		return null;
 	}
 
@@ -143,18 +156,13 @@ public class DropboxAdaptor implements Adaptor {
 		AuthenticationType a = new AuthenticationTypeImpl();
 
 		a = new AuthenticationTypeImpl();
-		a.setType(ACCESS_KEY_CREDENTIAL);
+		a.setType(ACCESS_TOKEN);
 		a.setDisplayName("Dropbox credential");
 
-		AuthenticationField f1 = new AuthenticationFieldImpl();
-		f1.setKeyName(ACCESS_KEY_USERNAME);
-		f1.setDisplayName("Dropbox username"); // FIXME
-		a.getFields().add(f1);
-
-		AuthenticationField f2 = new AuthenticationFieldImpl();
-		f2.setKeyName(ACCESS_KEY_CREDENTIAL);
-		f2.setDisplayName("Dropbox token");
-		a.getFields().add(f2);
+		AuthenticationField f = new AuthenticationFieldImpl();
+		f.setKeyName(ACCESS_TOKEN);
+		f.setDisplayName("Dropbox access token");
+		a.getFields().add(f);
 
 		l.getAuthenticationTypes().add(a);
 
@@ -164,14 +172,11 @@ public class DropboxAdaptor implements Adaptor {
 	private DbxClientV2 getDropboxClient(URIBase uri, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
 
-		DbxClientV2 client = null;
+		DbxClientV2 client = (session != null) ? (DbxClientV2) session.get(DROPBOX_CLIENT) : null;
 
 		// try to get client from session...
-		if (session != null) {
-			client = (DbxClientV2) session.get(DROPBOX_CLIENT);
-			if (client != null)
-				return client;
-		}
+		if (client != null)
+			return client;
 
 		// not found in session...
 
@@ -181,36 +186,21 @@ public class DropboxAdaptor implements Adaptor {
 
 		// check credentials
 		if (credentials == null)
-			throw new CredentialException("No credentials!");
+			throw new CredentialException("No credential!");
 
-		String username = credentials.getCredentialAttribute(ACCESS_KEY_USERNAME);
-		String accessKey = credentials.getCredentialAttribute(ACCESS_KEY_CREDENTIAL);
+		String accessKey = credentials.getCredentialAttribute(ACCESS_TOKEN);
 
-		if (username == null || accessKey == null) // check credentials
-			throw new CredentialException(
-					"Missing " + ACCESS_KEY_USERNAME + " and/or " + ACCESS_KEY_CREDENTIAL + " credentials!");
+		if (accessKey == null) // check credentials
+			throw new CredentialException("Missing " + ACCESS_TOKEN + " credential!");
 
-		DbxRequestConfig config = new DbxRequestConfig("dropbox/" + username);
-		client = new DbxClientV2(config, accessKey); // FIXME no exception if wrong credentials??
+		DbxRequestConfig config = new DbxRequestConfig("data avenue");
+		client = new DbxClientV2(config, accessKey);
 
 		// add newly created client to session, if there is session
 		if (session != null)
 			session.put(DROPBOX_CLIENT, client);
 
 		return client;
-
-		/*
-		 * DropboxClient clients = null; // FIXME if (clients == null) { if (credentials
-		 * == null) throw new CredentialException("No credentials!"); String username =
-		 * credentials.getCredentialAttribute(ACCESS_KEY_USERNAME); String accessKey =
-		 * credentials.getCredentialAttribute(ACCESS_KEY_CREDENTIAL); try {
-		 * 
-		 * clients = new DropboxClient().withClient(uri, username, accessKey); } catch
-		 * (IOException x) { throw new OperationException(x); } } DbxClientV2 client =
-		 * clients.get(uri); if (client == null) throw new
-		 * OperationException("APPLICATION ERROR: Cannot create Dropbox client!");
-		 * return client;
-		 */
 	}
 
 	@Override
@@ -219,33 +209,26 @@ public class DropboxAdaptor implements Adaptor {
 		if (uri.getType() != URIBase.URIType.URL && uri.getType() != URIBase.URIType.DIRECTORY)
 			throw new URIException("URI is not a URL or a directory!");
 		try {
-
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
 			List<URIBase> result = new Vector<URIBase>();
 
-			log.info("dropbox: " + client.auth());
-			log.info("dropbox: " + client.fileProperties());
+			// Name of the client user
 			log.info("dropbox: " + client.users().getCurrentAccount().getName());
 
-			// Get files and folder metadata from Drop box root directory
+			// Get files and folder metadata from Drop box directory
 			log.info("list path: " + uri.getPath());
-			ListFolderResult res = client.files().listFolder("/" + uri.getPath());
-			while (true) {
-				for (Metadata metadata : res.getEntries()) {
-					result.add(new DefaultURIBaseImpl( // FIXME uri eleje kell? dropbox://dropbox.com/folder/file
-							(metadata instanceof FolderMetadata) ? uri.getURI() + metadata.getName() + "/"
-									: uri.getURI() + metadata.getName()));
-				}
-				if (!res.getHasMore()) {
-					break;
-				}
-				res = client.files().listFolderContinue(res.getCursor());
+
+			// Get all the entries in the given directory
+			ListFolderResult userFiles = client.files().listFolder(URIBase.PATH_SEPARATOR + uri.getPath());
+			for (Metadata metadata : userFiles.getEntries()) {
+				// Check the type of the metadata
+				result.add(new DefaultURIBaseImpl((metadata instanceof FolderMetadata)
+						? uri.getURI() + metadata.getName() + URIBase.PATH_SEPARATOR
+						: uri.getURI() + metadata.getName()));
 			}
-
 			return result;
-
 		} catch (Throwable e) {
-			log.warn("Operation failed!", e);
+			log.warn("list failed!", e);
 			throw new OperationException(e);
 		}
 	}
@@ -253,19 +236,17 @@ public class DropboxAdaptor implements Adaptor {
 	@Override
 	public URIBase attributes(final URIBase uri, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
-		// if (uri.getType() != URIBase.URIType.FILE && uri.getType() !=
-		// URIBase.URIType.DIRECTORY) throw new URIException("Directory path
-		// expected!");
+		if (uri.getType() != URIBase.URIType.FILE)
+			throw new URIException("URI is not a file: " + uri.getURI());
 		DefaultURIBaseImpl uriEntry = new DefaultURIBaseImpl(uri.getPath());
-		log.info("ATTRIBUTE: " + uri.getPath());
 		try {
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
-			uriEntry.setLastModified(
-					(Long) client.files().download(uri.getPath()).getResult().getClientModified().getTime());
+			
+			// Get files' proerties
+			uriEntry.setLastModified(client.files().getTemporaryLink(uri.getPath()).getMetadata().getClientModified().getTime());
 			uriEntry.setSize(client.files().download(uri.getPath()).getResult().getSize());
-
 		} catch (Throwable e) {
-			log.warn("attr failed!", e);
+			log.warn("attribute file failed!", e);
 			throw new OperationException(e);
 		}
 		return uriEntry;
@@ -279,31 +260,30 @@ public class DropboxAdaptor implements Adaptor {
 		if (uri.getType() != URIBase.URIType.URL && uri.getType() != URIBase.URIType.DIRECTORY)
 			throw new URIException("URI is not a directory: " + uri.getURI());
 
-		log.info("ATTRIBUTE!!!: " + uri.getPath());
 		List<URIBase> result = new Vector<URIBase>();
 
 		try {
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
-
-			ListFolderResult res = client.files().listFolder("/" + uri.getPath());
+			ListFolderResult res = client.files().listFolder(URIBase.PATH_SEPARATOR + uri.getPath());
 
 			while (true) {
 				for (Metadata metadata : res.getEntries()) {
-					log.info("google drive: " + metadata.getName());
 					if (subentires != null && subentires.size() > 0)
-						if (!subentires.contains((metadata instanceof FolderMetadata) ? "/" + metadata.getName() + "/"
-								: "/" + metadata.getName()))
+						if (!subentires.contains((metadata instanceof FolderMetadata)
+								? metadata.getPathDisplay() + URIBase.PATH_SEPARATOR
+								: metadata.getPathDisplay()))
 							continue;
 					if (metadata instanceof FolderMetadata) {
-						DefaultURIBaseImpl uriEntry = new DefaultURIBaseImpl("/" + metadata.getName() + "/");
+						// If the entry is directory, then set size null
+						DefaultURIBaseImpl uriEntry = new DefaultURIBaseImpl(metadata.getPathDisplay() + URIBase.PATH_SEPARATOR);
 						uriEntry.setSize(null);
 						result.add(uriEntry);
 					} else {
-						DefaultURIBaseImpl uriEntry = new DefaultURIBaseImpl(metadata.getName());
-						uriEntry.setLastModified((Long) client.files().download(uri.getPath() + metadata.getName())
-								.getResult().getClientModified().getTime());
-						uriEntry.setSize(
-								client.files().download(uri.getPath() + metadata.getName()).getResult().getSize());
+						
+						// Files' properties queried
+						DefaultURIBaseImpl uriEntry = new DefaultURIBaseImpl(metadata.getPathLower());
+						uriEntry.setLastModified(((FileMetadata) metadata).getClientModified().getTime());
+						uriEntry.setSize(((FileMetadata) metadata).getSize());
 						result.add(uriEntry);
 					}
 				}
@@ -312,29 +292,36 @@ public class DropboxAdaptor implements Adaptor {
 				}
 				res = client.files().listFolderContinue(res.getCursor());
 			}
-
 		} catch (Throwable e) {
-			log.warn("attr failed!", e);
+			log.warn("attribute list failed!", e);
 			throw new OperationException(e);
 		}
-
 		return result;
 	}
 
 	@Override
 	public void mkdir(URIBase uri, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
-		if (!uri.getPath().endsWith("/"))
+		if (!uri.getPath().endsWith(URIBase.PATH_SEPARATOR))
 			throw new OperationException("URI must end with /!");
-
-		// Upload file to Drop box
+		if (uri.getType() != URIBase.URIType.URL && uri.getType() != URIBase.URIType.DIRECTORY)
+			throw new URIException("URI is not a directory: " + uri.getURI());
+		// Create folder to Drop box
 		try {
+			// Create a Pattern object
+			Pattern r = Pattern.compile("[a-zA-Z]");
+			// Now create matcher object.
+			Matcher m = r.matcher(uri.getEntryName());
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
 			// Cut "/" from the file for example: /test/ => test
-			log.info("testing make dir!: " + uri.getPath().substring(0, uri.getPath().length() - 1));
-			client.files().createFolderV2(uri.getPath().substring(0, uri.getPath().length() - 1));
-			// client.files().createFolderV2("/aaaabbbccc");
-			log.info("FILE NAME TO CREATE!!!!: " + uri.getPath());
+			log.info("testing make dir!: " + uri.getEntryName());
+			if (!m.find()) {
+				throw new OperationException("Only A-Z characters are allowed!");
+			}
+			if (uri.getEntryName().length() > 20) {
+				throw new OperationException("Filename can not be longer than 20 character!");
+			}
+			client.files().createFolderV2(uri.getPath().substring(0, uri.getPath().length()-1));
 		} catch (Throwable e) {
 			log.warn("make directory failed!", e);
 			throw new OperationException(e);
@@ -344,16 +331,15 @@ public class DropboxAdaptor implements Adaptor {
 	@Override
 	public void rmdir(URIBase uri, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
-		if (!uri.getPath().endsWith("/"))
+		if (!uri.getPath().endsWith(URIBase.PATH_SEPARATOR))
 			throw new OperationException("URI must end with /!");
-//		if (uri.getType() != URIBase.URIType.URL && uri.getType() != URIBase.URIType.DIRECTORY)
-//			throw new URIException("URI is not a directory: " + uri.getURI());
-
+		if (uri.getType() != URIBase.URIType.URL && uri.getType() != URIBase.URIType.DIRECTORY)
+			throw new URIException("URI is not a directory: " + uri.getURI());
 		try {
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
-			// Cut "/" from the file for example: /test/ => test
-			log.info(uri.getPath().substring(0, uri.getPath().length() - 1));
-			client.files().deleteV2(uri.getPath().substring(0, uri.getPath().length() - 1));
+			// Delete directory
+			log.info("delete folder: " +uri.getPath().substring(0,uri.getPath().length()-1));
+			client.files().deleteV2(uri.getPath().substring(0,uri.getPath().length()-1));
 		} catch (Throwable e) {
 			log.warn("delete folder failed!", e);
 			throw new OperationException(e);
@@ -365,9 +351,9 @@ public class DropboxAdaptor implements Adaptor {
 			throws URIException, OperationException, CredentialException {
 		if (uri.getType() != URIBase.URIType.FILE)
 			throw new URIException("URI is not a file: " + uri.getURI());
-
 		try {
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
+			// Delete a file
 			client.files().deleteV2(uri.getPath());
 		} catch (Throwable e) {
 			log.warn("Delete file failed!", e);
@@ -384,61 +370,42 @@ public class DropboxAdaptor implements Adaptor {
 	@Override
 	public void rename(URIBase uri, String newName, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
+		if (uri.getType() != URIBase.URIType.FILE)
+			throw new URIException("URI is not a file: " + uri.getURI());
 		try {
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
-			// Cut "/" from the file for example: /test/ => test
-			log.info(uri.getPath().substring(1, uri.getPath().length() - 1));
+			// Move function is used to rename the file, for example: /folder/abc.txt => /folder/cba.txt
 			String newPath = uri.getPath();
-			newPath = newPath.substring(0, newPath.lastIndexOf('/') + 1);
+			// Create a Pattern object
+			Pattern r = Pattern.compile("[a-zA-Z]");
+			//  matcher object.
+			Matcher m = r.matcher(newName);
+			if (!m.find()) {
+				throw new OperationException("Only A-Z characters are allowed!");
+			}
+			if (newName.length() > 20) {
+				throw new OperationException("Filename can not be longer than 20 character!");
+			}
+			newPath = newPath.substring(0, newPath.lastIndexOf(URIBase.PATH_SEPARATOR) + 1);
 			newPath += newName;
-			log.info("Path of the file " + newPath);
+			log.info("Path of the file " + newPath + " " + uri.getPath());
+			// Change the file path with the name
 			client.files().moveV2(uri.getPath(), newPath);
 		} catch (Throwable e) {
-			log.warn("delete folder failed!", e);
+			log.warn("Rename file failed!", e);
 			throw new OperationException(e);
-		}
-	}
-
-	class InputStreamWrapper extends InputStream {
-		InputStream is;
-		DataAvenueSession session;
-
-		InputStreamWrapper(InputStream is, DataAvenueSession session) {
-			this.is = is;
-			this.session = session;
-		}
-
-		@Override
-		public int read() throws IOException {
-			return is.read();
-		}
-
-		@Override
-		public int read(byte b[]) throws IOException {
-			return is.read(b);
-		}
-
-		@Override
-		public int read(byte b[], int off, int len) throws IOException {
-			return is.read(b, off, len);
-		}
-
-		@Override
-		public void close() throws IOException {
-			is.close();
 		}
 	}
 
 	@Override
 	public InputStream getInputStream(URIBase uri, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
-		if (uri.getType() != URIBase.URIType.FILE)
-			throw new URIException("URI is not a file: " + uri.getURI());
 		try {
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
-			return new InputStreamWrapper(client.files().download(uri.getPath()).getInputStream(), session);
+			// Download a file with the getInputSteam 
+			return client.files().download(uri.getPath()).getInputStream();
 		} catch (Throwable e) {
-			log.warn("Operation failed!", e);
+			log.warn("Download failed!", e);
 			throw new OperationException(e);
 		}
 	}
@@ -447,16 +414,14 @@ public class DropboxAdaptor implements Adaptor {
 	public OutputStream getOutputStream(final URIBase uri, final Credentials credentials,
 			final DataAvenueSession dataAvenueSession, long contentLength)
 			throws URIException, OperationException, CredentialException {
-
-		throw new OperationException("Not implemented");
-		/*
-		 * log.info("UPLOAD FILE!!! " + uri.getPath()); OutputStreamWrapper uploadedFile
-		 * = null; try { DbxClientV2 client = getDropboxClient(uri, credentials,
-		 * dataAvenueSession); uploadedFile = new
-		 * OutputStreamWrapper(client.files().upload("").getOutputStream(),
-		 * dataAvenueSession); } catch (Throwable e) { log.warn("upload failed!", e);
-		 * throw new OperationException(e); } return uploadedFile;
-		 */
+		log.info("UPLOAD FILE " + uri.getPath());
+		try {
+			DbxClientV2 client = getDropboxClient(uri, credentials, dataAvenueSession);
+			return client.files().upload(uri.getPath()).getOutputStream();
+		} catch (Throwable e) {
+			log.warn("upload failed!", e);
+			throw new OperationException(e);
+		}
 	}
 
 	@Override
@@ -465,6 +430,7 @@ public class DropboxAdaptor implements Adaptor {
 			IllegalArgumentException, OperationNotSupportedException {
 		try {
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
+			// Upload a file with the InputStream
 			client.files().uploadBuilder(uri.getPath()).uploadAndFinish(inputStream);
 		} catch (Throwable e) {
 			log.warn("upload failed!", e);
@@ -492,22 +458,37 @@ public class DropboxAdaptor implements Adaptor {
 	@Override
 	public long getFileSize(URIBase uri, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
+		if (uri.getType() != URIBase.URIType.FILE)
+			throw new URIException("URI is not a file: " + uri.getURI());
 		try {
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
-			return client.files().download(uri.getPath()).getResult().getSize();
+			// getTemporaryLink can recover
+			return client.files().getTemporaryLink(uri.getPath()).getMetadata().getSize();
 		} catch (Throwable e) {
 			log.warn("file size failed!", e);
 			throw new OperationException(e);
 		}
 	}
-
+	
+	// This is used in the isReadable and isWritable functions
 	public boolean exists(URIBase uri, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
+		if (uri.getType() != URIBase.URIType.FILE)
+			throw new URIException("URI is not a file: " + uri.getURI());
 		try {
 			DbxClientV2 client = getDropboxClient(uri, credentials, session);
-			return client.files().search("", uri.getPath()).getStart() > 0;
+			// Check for the file in the substring of the directory
+			long count = uri.getPath().chars().filter(ch -> ch == '/').count();
+			String path = (count > 1)? uri.getPath().substring(0, uri.getPath().lastIndexOf(URIBase.PATH_SEPARATOR)) : "";
+			log.info("path: "+ path);
+			
+			ListFolderResult res = client.files().listFolder(path);
+			for (Metadata metadata : res.getEntries()) {
+				if(metadata.getName().equals(uri.getEntryName())) return true;
+			}
+			return false;
 		} catch (Throwable e) {
-			log.warn("Exist failed!", e);
+			log.warn("Exists failed!", e);
 			throw new OperationException(e);
 		}
 	}
@@ -516,12 +497,16 @@ public class DropboxAdaptor implements Adaptor {
 	@Override
 	public boolean isReadable(URIBase uri, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
+		if (uri.getType() != URIBase.URIType.FILE)
+			throw new URIException("URI is not a file: " + uri.getURI());
 		return exists(uri, credentials, session);
 	}
 
 	@Override
 	public boolean isWritable(URIBase uri, Credentials credentials, DataAvenueSession session)
 			throws URIException, OperationException, CredentialException {
+		if (uri.getType() != URIBase.URIType.FILE)
+			throw new URIException("URI is not a file: " + uri.getURI());
 		return exists(uri, credentials, session);
 	}
 
