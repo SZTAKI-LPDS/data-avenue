@@ -1,9 +1,9 @@
 #!/bin/bash
 # Usage: test.sh [dataavenue host] [dataavenue key]
-set -x
+#set -x
 
 # load credentials, set constants
-. ./test.config
+. ./copy.config
 DATA_AVENUE_HOST=http://localhost:8080
 if [ "$#" -gt 0 ]; then DATA_AVENUE_HOST=$1 ; else echo Using default dataavenue host: localhost ; fi
 KEY=dataavenue
