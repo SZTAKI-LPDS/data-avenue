@@ -56,6 +56,8 @@
 		<!--module>data-avenue.adaptor.cassandra</module--> <!-- commented because of guava 16 (cassandra) vs. guava 18 (jclouds) conflict -->
 		<module>data-avenue.core.service</module>
 		<module>data-avenue.core.war</module>
+		<module>data-avenue.adaptor.dropbox</module>
+		<module>data-avenue.adaptor.googledrive</module>
   	</modules>
 		
 	<build>
