@@ -20,9 +20,7 @@ Developed by the [Laboratory of Parallel and Distributed Systems](https://www.sz
 
 ## What's new
 
-13/01/2021 GoogleDrive and DropBox support
-
-GoogleDrive and DropBox adaptors (in beta testing), available develop branch
+13/01/2021 GoogleDrive and DropBox support - these new adaptors (in beta testing) are available develop branch
 
 
 06/07/2020 Release v1.0
