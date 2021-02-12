@@ -91,10 +91,8 @@ public class JSagaGenericAdaptor implements Adaptor {
 
 	static final boolean AUTO_DETECT_GLOBUS_PROXY = true;
 	
-	// lfc, irods not yet supported
-	// 
-	// https://packages.microsoft.com/repos/vscode/
-	private static final List<String> allowedProtocols = Arrays.asList(HTTP_PROTOCOL, HTTPS_PROTOCOL, SFTP_PROTOCOL, GSIFTP_PROTOCOL, SRM_PROTOCOL, IRODS_PROTOCOL, LFC_PROTOCOL);
+	// note: irods not supported <= fr.in2p3.jsaga.adaptor:jsaga-adaptor-irods:jar:1.1.1-SNAPSHOT depends on org.irods.jargon:jargon-core:pom:3.3.1.1 and repo down: https://ci-dev.renci.org/nexus/content/repositories/releases
+	private static final List<String> allowedProtocols = Arrays.asList(HTTP_PROTOCOL, HTTPS_PROTOCOL, SFTP_PROTOCOL, GSIFTP_PROTOCOL, SRM_PROTOCOL, LFC_PROTOCOL);
 	// MyProxy authentication is not yet supported (requires proxy to access MyProxy server) 
 	private static final List<String> allowedAuthenticationTypes = Arrays.asList(NONE_AUTH, USERPASS_AUTH, SSH_AUTH, /*MYPROXY_AUTH,*/ VOMS_AUTH, /*VOMSMYPROXY_AUTH,*/ GLOBUS_AUTH, GLOBUSRFC3820_AUTH, GLOBUSLEGACY_AUTH);
 	public static boolean CONVERT_CREDENTIAL_ATTRIBUTES_TO_TEMP_FILES = true; // false: for junit testing
