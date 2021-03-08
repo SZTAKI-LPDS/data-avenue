@@ -63,7 +63,7 @@
 		<dependency> 
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
+			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>		
 
@@ -113,12 +113,12 @@
 			<version>${jsaga.engine.build}</version>
 		</dependency>
 
-		<!-- jSAGA irods adaptor -->
-		<dependency> 
+		<!-- jSAGA irods adaptor, ci-dev.renci.org is down -->
+		<!--dependency> 
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-irods</artifactId>
 			<version>${jsaga.irods.build}</version>
-		</dependency>
+		</dependency-->
 
 		<!-- jSAGA ssh adaptor -->
 		<dependency> 
