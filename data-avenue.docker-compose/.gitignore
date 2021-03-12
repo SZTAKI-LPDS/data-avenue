@@ -3,3 +3,7 @@
 /.project
 /data-avenue-docker-compose-latest.tar.gz
 /target/
+dataavenue/logs/*
+dataavenue/webapps/dataavenue.war
+db/
+
