@@ -20,6 +20,8 @@ Developed by the [Laboratory of Parallel and Distributed Systems](https://www.sz
 
 ## What's new
 
+12/03/2021 Branch develop merged into master
+
 13/01/2021 GoogleDrive and DropBox support - these new adaptors (in beta testing) are available develop branch
 
 06/07/2020 Release v1.0
