@@ -15,7 +15,7 @@
             <property name="hibernate.archive.autodetection" value="class, hbm"/>
             <property name="hibernate.show_sql" value="false"/>
             
-            <property name="hibernate.connection.url" value="jdbc:mysql://dataavenue-database/dataavenue"/>
+            <property name="hibernate.connection.url" value="jdbc:mysql://dataavenue-database/dataavenue?useSSL=false"/>
             <property name="hibernate.connection.username" value="da"/>
             <property name="hibernate.connection.password" value="da"/>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
